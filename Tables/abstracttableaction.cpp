@@ -8,6 +8,13 @@
 #include <QPushButton>
 #include "beantabledatamodel.h"
 #include "mysortfilterproxymodel.h"
+#include <QRegExp>
+#include "systemconnectionmemomanager.h"
+#include "loggerfactory.h"
+#include "managercombobox.h"
+#include "actionlistener.h"
+#include "proxyturnoutmanager.h"
+#include "proxylightmanager.h"
 
 AbstractTableAction::AbstractTableAction(QObject *parent) :
     AbstractAction(parent)
@@ -33,10 +40,9 @@ AbstractTableAction::AbstractTableAction(QObject *parent) :
 {
  //super(actionName);
  _includeAddButton = true;
- log = new Logger("AbstractTableAction");
  m=NULL;
  table = NULL;
- connect(this, SIGNAL(triggered()), this, SLOT(actionPerformed()));
+ //connect(this, SIGNAL(triggered()), this, SLOT(actionPerformed()));
 }
 
 ///*public*/ AbstractTableAction(QString actionName, QObject option, QObject *parent) :
@@ -63,12 +69,12 @@ AbstractTableAction::AbstractTableAction(QObject *parent) :
 /*protected*/ /*abstract*/ void AbstractTableAction::setTitle() {}
 
 
-/*public*/ void AbstractTableAction::actionPerformed(ActionEvent* /*e*/)
+/*public*/ void AbstractTableAction::actionPerformed(JActionEvent * /*e*/)
 {
  // create the JTable model, with changes for specific NamedBean
  createModel();
- if(m != NULL)
- {
+// if(m != NULL)
+// {
  //TableSorter sorter = new TableSorter(m);
  MySortFilterProxyModel* sorter = new MySortFilterProxyModel(m);
  //sorter->setSourceModel((QAbstractItemModel*)m);
@@ -102,13 +108,14 @@ AbstractTableAction::AbstractTableAction(QObject *parent) :
 //        }
 //    };
   f = new ATABeanTableFrame(m, helpTarget(), dataTable, this);
- }
- else
- {
-  f= new ATABeanTableFrame(this);
- }
- buildMenus(f);
- setMenuBar(f);
+// }
+// else
+// {
+//  f= new ATABeanTableFrame(this);
+// }
+ //buildMenus(f);
+ setMenuBar(f); // comes after the Help menu is added by f = new
+                // BeanTableFrame(etc.) in stand alone application
  setTitle();
  addToFrame(f);
  f->adjustSize();
@@ -132,15 +139,15 @@ void ATABeanTableFrame::extras()
   addToBottomBox(addButton, "this.getClass().getName()");
 //  addButton.addActionListener(new ActionListener() {
 //    /*public*/ void actionPerformed(ActionEvent e) {
-//        addPressed(e);
+  connect(addButton, &QPushButton::clicked, [=]{
+        act->addPressed(/*e*/);
 //    }
-//  });
+  });
   QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
   sizePolicy.setHeightForWidth(addButton->sizePolicy().hasHeightForWidth());
   addButton->setSizePolicy(sizePolicy);
-  connect(addButton, SIGNAL(clicked()),act, SLOT(addPressed()));
  }
 }
 /*public*/ QString ATABeanTableFrame::getClassName()
@@ -189,9 +196,29 @@ void ATABeanTableFrame::extras()
 }
 
 /*public*/ void AbstractTableAction::dispose() {
-//    if (m!=NULL){
-//        m.dispose();
-//    }
+    if (m!=NULL){
+        m->dispose();
+    }
+}
+
+/**
+ * Increments trailing digits of a system/user name (string) I.E. "Geo7"
+ * returns "Geo8" Note: preserves leading zeros: "Geo007" returns "Geo008"
+ * Also, if no trailing digits, appends "1": "Geo" returns "Geo1"
+ *
+ * @param name the system or user name string
+ * @return the same name with trailing digits incremented by one
+ */
+/*protected*/ /*@Nonnull*/ QString AbstractTableAction::nextName(/*@Nonnull*/ QString name) {
+    QStringList parts = name.split(QRegExp("(?=\\d+$)")/*, 2*/);
+    QString numString = "0";
+    if (parts.length() == 2) {
+        numString = parts[1];
+    }
+    /*final*/ int numStringLength = numString.length();
+    /*final*/ int num = numString.toInt() + 1;
+    //return parts[0] + String.format("%0" + numStringLength + "d", num);
+    return parts.at(0) + QStringLiteral("%1").arg(num, numStringLength, 10, QLatin1Char('0'));
 }
 
 /**
@@ -225,6 +252,84 @@ void ATABeanTableFrame::extras()
 */
 /*public*/ void AbstractTableAction::print(JTable::PrintMode /*mode*/, QString /*headerFormat*/, QString /*footerFormat*/){ log->error("Caught here");}
 
-/*protected*/ /*abstract*/ void AbstractTableAction::addPressed(ActionEvent* /*e*/) {}
+/*protected*/ /*abstract*/ void AbstractTableAction::addPressed() {}
 
+/**
+ * Configure the combo box listing managers.
+ * Can be placed on Add New pane to select a connection for the new item.
+ *
+ * @param comboBox     the combo box to configure
+ * @param manager      the current manager
+ * @param managerClass the implemented manager class for the current
+ *                     manager; this is the class used by
+ *                     {@link InstanceManager#getDefault(Class)} to get the
+ *                     default manager, which may or may not be the current
+ *                     manager
+ */
+/*protected*/ void AbstractTableAction::configureManagerComboBox(ManagerComboBox/*<E>*/* comboBox, Manager/*<E>*/* manager,
+        /*Class<? extends Manager<E>>*/QString managerClass) {
+    Manager/*<E>*/* defaultManager = (Manager*)InstanceManager::getDefault(managerClass);
+    // populate comboBox
+    if(qobject_cast<ProxyManager*>(defaultManager)) {
+        comboBox->setManagers(defaultManager);
+    } else {
+        comboBox->setManagers(manager);
+    }
+    // set current selection
+    if (qobject_cast<ProxyManager*>(defaultManager)) {
+        UserPreferencesManager* upm = (UserPreferencesManager*)InstanceManager::getDefault("UserPreferencesManager");
+        QString systemSelectionCombo = /*this.getClass().getName()*/QString("jmri.jmrit.beantable.")+metaObject()->className() + ".SystemSelected";
+        if (upm->getComboBoxLastSelection(systemSelectionCombo) != "") {
+            SystemConnectionMemo* memo = SystemConnectionMemoManager::getDefault()
+                    ->getSystemConnectionMemoForUserName(upm->getComboBoxLastSelection(systemSelectionCombo));
+            comboBox->setSelectedItem(/*memo->get*/(managerClass));
+        } else {
+            //ProxyManager/*<E>*/* proxy = (ProxyManager/*<E>*/*) manager;
+            if(qobject_cast<ProxyTurnoutManager*>(manager))
+             comboBox->setSelectedItem(((ProxyTurnoutManager*)manager)->getDefaultManager()->toString());
+            if(qobject_cast<ProxySensorManager*>(manager))
+             comboBox->setSelectedItem(((ProxySensorManager*)manager)->getDefaultManager()->toString());
+            if(qobject_cast<ProxyLightManager*>(manager))
+             comboBox->setSelectedItem(((ProxyLightManager*)manager)->getDefaultManager()->toString());
+            if(qobject_cast<ProxyReporterManager*>(manager))
+             comboBox->setSelectedItem(((ProxyReporterManager*)manager)->getDefaultManager()->toString());
+        }
+    } else {
+        comboBox->setSelectedItem(manager->toString());
+    }
+}
 
+/**
+ * Remove the Add panel prefixBox listener before disposal.
+ * The listener is created when the Add panel is defined.  It persists after the
+ * the Add panel has been disposed.  When the next Add is created, AbstractTableAction
+ * sets the default connection as the current selection.  This triggers validation before
+ * the new Add panel is created.
+ * <p>
+ * The listener is removed by the controlling table action before disposing of the Add
+ * panel after Close or Create.
+ * @param prefixBox The prefix combobox that might contain the listener.
+ */
+/*protected*/ void AbstractTableAction::removePrefixBoxListener(ManagerComboBox/*<E>*/* prefixBox) {
+    //Arrays.asList(prefixBox.getActionListeners()).forEach((l) ->
+//    foreach(ActionListener* l, prefixBox->getActionListeners)
+//    {
+//        prefixBox->removeActionListener(l);
+//    }//);
+}
+
+/**
+ * Display a warning to user about invalid entry. Needed as entry validation
+ * does not disable the Create button when full system name eg "LT1" is entered.
+ *
+ * @param curAddress address as entered in Add new... pane address field
+ * @param ex the exception that occurred
+ */
+/*protected*/ void AbstractTableAction::displayHwError(QString curAddress, Exception ex) {
+    ((UserPreferencesManager*)InstanceManager::getDefault("UserPreferencesManager"))->
+            showErrorMessage(tr("Error"),
+                    tr("Unable to convert \"%1\" to a valid Hardware Address.").arg(curAddress),"" + ex.getMessage(),"",
+                    true,false);
+}
+
+/*private*/ /*static*/ /*final*/ Logger* AbstractTableAction::log = LoggerFactory::getLogger("AbstractTableAction");

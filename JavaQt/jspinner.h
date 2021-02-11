@@ -32,7 +32,9 @@ public:
 // /*public*/ void setVisible(bool b);
  /*public*/ void setBorder(Border* border) override {this->_border = border;}
  /*public*/ Border* getBorder() {return _border;}
-
+ /*public*/ void setEnabled(bool b) override;
+ void setTickInterval(int i);
+ void setTickPosition(int i);
 public slots:
  void onValueChanged(int);
 

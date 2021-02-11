@@ -13,12 +13,13 @@
 #include "loggerfactory.h"
 #include "namedbeancomparator.h"
 #include "vetoablechangesupport.h"
+#include "defaultsystemconnectionmemo.h"
 
 // NOTE: This class is a replacement for AbstractProxyManager that
 // implements SensorManager instead of AbstractManager
 
 AbstractProxyReporterManager::AbstractProxyReporterManager(QObject *parent)
-    : ReporterManager(new SystemConnectionMemo(), parent)
+    : ReporterManager(new DefaultSystemConnectionMemo(), parent)
 {
  mgrs = QList<Manager*>();
  internalManager = nullptr;
@@ -81,7 +82,7 @@ AbstractProxyReporterManager::AbstractProxyReporterManager(QObject *parent)
  * Returns a list of all managers, including the
  * internal manager.  This is not a live list.
  */
-/*public*/ QList<Manager*> AbstractProxyReporterManager::getManagerList()
+/*public*/ QList<Manager*> AbstractProxyReporterManager::getManagerList() const
 {
  // make sure internal present
  initInternal();
@@ -95,7 +96,7 @@ AbstractProxyReporterManager::AbstractProxyReporterManager(QObject *parent)
  *
  * @return the list of managers
  */
-/*public*/ QList<Manager*> AbstractProxyReporterManager::getDisplayOrderManagerList() {
+/*public*/ QList<Manager*> AbstractProxyReporterManager::getDisplayOrderManagerList() const {
     // make sure internal present
     initInternal();
 
@@ -286,10 +287,10 @@ AbstractProxyReporterManager::AbstractProxyReporterManager(QObject *parent)
     int index = matchTentative(systemName);
     if (index >= 0) {
         Manager* m = getMgr(index);
-        return (Reporter*)m->getBySystemName(systemName);
+        return (Reporter*)((AbstractReporterManager*)m)->getBySystemName(systemName);
     }
     log->debug(tr("getBySystemName did not find manager from name %1, defer to default manager").arg(systemName)); // NOI18N
-    return (Reporter*)getDefaultManager()->getBySystemName(systemName);
+    return (Reporter*)((AbstractReporterManager*)getDefaultManager())->getBySystemName(systemName);
 }
 
 /** {@inheritDoc} */
@@ -298,7 +299,7 @@ AbstractProxyReporterManager::AbstractProxyReporterManager(QObject *parent)
 //@CheckForNull
 /*public*/ Reporter *AbstractProxyReporterManager::getByUserName(/*@Nonnull*/ QString userName) const{
     for (Manager* m : this->mgrs) {
-        NamedBean* b = m->getByUserName(userName);
+        NamedBean* b = ((AbstractReporterManager*)m)->getByUserName(userName);
         if (b != nullptr) {
             return (Reporter*)b;
         }

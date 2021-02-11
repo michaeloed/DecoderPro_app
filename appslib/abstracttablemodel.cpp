@@ -9,8 +9,8 @@ AbstractTableModel::AbstractTableModel(QObject *parent) :
     TableModel(parent)
 {
  listenerList = new QList<EventListener*>();
- buttonMap = QList<int>();
- _table = NULL;
+// buttonMap = QList<int>();
+ //_table = NULL;
 }
 /**
  *  This abstract class provides default implementations for most of
@@ -126,6 +126,7 @@ AbstractTableModel::AbstractTableModel(QObject *parent) :
  else
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
+
 /**
  *  This empty implementation is provided so users don't have to implement
  *  this method if their data model is not editable.
@@ -299,7 +300,7 @@ int AbstractTableModel::columnCount(const QModelIndex &parent) const
 //                         TableModelEvent::ALL_COLUMNS, TableModelEvent::DELETE));
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     endInsertRows();
-    setPersistentButtons();
+    //setPersistentButtons();
 }
 
 /**
@@ -403,37 +404,37 @@ int AbstractTableModel::columnCount(const QModelIndex &parent) const
  table->setItemDelegateForColumn(column, delegate = new MyDelegate());
  if(sample != NULL)
   delegate->setText(sample->text());
- if(!buttonMap.contains(column))
-  buttonMap.append(column);
+// if(!buttonMap.contains(column))
+//  buttonMap.append(column);
 // setHeaderData(column, Qt::Horizontal, 1, Qt::UserRole);
 // ButtonColumnDelegate* delegate = new ButtonColumnDelegate(table);
 // table->setItemDelegate(delegate);
  //setPersistentButtons();
 }
 
-void AbstractTableModel::setColumnToHoldDelegate(JTable *table, int column, QItemDelegate *delegate)
+void AbstractTableModel::setColumnToHoldDelegate(JTable *table, int column, QStyledItemDelegate *delegate)
 {
  this->_table = table;
  table->setItemDelegateForColumn(column, delegate);
- if(!buttonMap.contains(column))
-  buttonMap.append(column);
+// if(!buttonMap.contains(column))
+//  buttonMap.append(column);
 }
 
-void AbstractTableModel::setPersistentButtons()
-{
- int rows = rowCount(QModelIndex());
- for(int row = 0; row < rows; row ++)
- {
-  foreach(int col, buttonMap)
-  {
-   QModelIndex ix = index(row, col);
-   if((flags(ix) & Qt::ItemIsEnabled) != 0 )
-   {
-    _table->openPersistentEditor(ix);
-   }
-  }
- }
-}
+//void AbstractTableModel::setPersistentButtons()
+//{
+// int rows = rowCount(QModelIndex());
+// for(int row = 0; row < rows; row ++)
+// {
+//  foreach(int col, buttonMap)
+//  {
+//   QModelIndex ix = index(row, col);
+//   if((flags(ix) & Qt::ItemIsEnabled) != 0 )
+//   {
+//    _table->openPersistentEditor(ix);
+//   }
+//  }
+// }
+//}
 
 void AbstractTableModel::setTable(JTable * t)
 {
@@ -444,7 +445,7 @@ JTable* AbstractTableModel::table() { return _table;}
 
 /*public*/ QVariant AbstractTableModel::getValueAt(int row, int col) const
 {
- //return data(index(row, col), Qt::DisplayRole);
+ return data(index(row, col), Qt::DisplayRole);
 }
 
 QVariant AbstractTableModel::data(const QModelIndex &index, int role) const

@@ -69,6 +69,10 @@
 #include "rfid/proxyidtagmanager.h"
 #include "proxylightmanager.h"
 #include "editormanager.h"
+#include "proxymetermanager.h"
+#include "ctc/ctcmanager.h"
+#include "ctc/ctcexceptionbuffer.h"
+#include "appsconfigurationmanager.h"
 
 DefaultInstanceInitializer::DefaultInstanceInitializer()
 {
@@ -103,9 +107,8 @@ QObject* DefaultInstanceInitializer::getDefault(QString type) const
          type == "ConditionalManager" ||
          type ==  "LogixManager" ||
          type == "MemoryManager" ||
-         type == "RouteManager" ||
+         type == "RouteManager" || type == "DefaultRouteManager" ||
          type == "SignalGroupManager" ||
-         type == "SignalHeadManager" ||
          type == "SignalHeadManager" ||
          type == "SignalMastLogicManager" ||
          type == "SignalMastManager" ||
@@ -158,6 +161,11 @@ QObject* DefaultInstanceInitializer::getDefault(QString type) const
     return mm;
  }
 
+ if (type == "MeterManager") {
+  ProxyMeterManager* mm = new ProxyMeterManager();
+  InstanceManager::store(mm,type);
+  return mm;
+ }
 // if (type == RailComManager.class) {
 //             return new DefaultRailComManager();
 //         }
@@ -193,7 +201,7 @@ QObject* DefaultInstanceInitializer::getDefault(QString type) const
  if (type == "SignalHeadManager")
  {
    AbstractSignalHeadManager* o =  new AbstractSignalHeadManager(memo);
-   InstanceManager::store(o, type);
+//   InstanceManager::store(o, type);
    return o;
  }
 
@@ -364,16 +372,16 @@ QObject* DefaultInstanceInitializer::getDefault(QString type) const
 
  }
 
+// if(type == "ConfigureManager")
+// {
+//  ConfigXmlManager* cm = new ConfigXmlManager();
+//  InstanceManager::store(cm,type);
+//  return cm;
+// }
+
  if(type == "ConfigureManager")
  {
-  ConfigXmlManager* cm = new ConfigXmlManager();
-  InstanceManager::store(cm,type);
-  return cm;
- }
-
- if(type == "JmriConfigurationManager")
- {
-  ConfigXmlManager* cm = new ConfigXmlManager();
+  ConfigureManager* cm = new AppsConfigurationManager();
   InstanceManager::store(cm,type);
   return cm;
  }
@@ -574,7 +582,25 @@ QObject* DefaultInstanceInitializer::getDefault(QString type) const
 //  InstanceManager::store(lncm,type);
 //  return pitm;
 // }
+ if (type == "CtcManager")
+ {
+  CtcManager* m = new CtcManager();
+  InstanceManager::store(m, type);
+  return m;
+ }
 
+ if (type == "CTCExceptionBuffer")
+ {
+  CTCExceptionBuffer* m = new CTCExceptionBuffer();
+  InstanceManager::store(m, type);
+  return m;
+ }
+
+ if (type == "DefaultRouteManager")
+ {
+  DefaultRouteManager* m = new DefaultRouteManager(memo);
+  return m;
+ }
 
  // this is an error!
  //throw new IllegalArgumentException("Cannot create object of type "+type);

@@ -6,6 +6,7 @@
 #include "logger.h"
 #include "configxmlmanager.h"
 #include "jmriconfigurationmanager.h"
+#include "loggerfactory.h"
 
 //LoadXmlConfigAction::LoadXmlConfigAction(QObject *parent) :
 //  LoadStoreBaseAction(parent)
@@ -51,7 +52,7 @@ void LoadXmlConfigAction::common()
  log = new Logger("LoadXmlConfigAction");
 }
 
-/*public*/ void LoadXmlConfigAction::actionPerformed(ActionEvent* /*e*/)
+/*public*/ void LoadXmlConfigAction::actionPerformed(JActionEvent* /*e*/)
 {
  loadFile(this->getConfigFileChooser());
 }
@@ -64,6 +65,7 @@ void LoadXmlConfigAction::common()
 /*protected*/ bool LoadXmlConfigAction::loadFile(JFileChooser* fileChooser)
 {
  bool results = false;
+ fileChooser->settimeout(15); // 15 sec timeout
  File* file = getFile(fileChooser);
  if (file != nullptr)
  {
@@ -107,7 +109,6 @@ void LoadXmlConfigAction::common()
 
 /*static*/ /*public*/ File* LoadXmlConfigAction::getFileCustom(JFileChooser* fileChooser)
 {
- Logger* log = new Logger("LoadXmlConfigAction");
  //fileChooser.rescanCurrentDirectory();
  int retVal = fileChooser->showDialog(nullptr, "");
  if (retVal != JFileChooser::APPROVE_OPTION) {
@@ -118,3 +119,6 @@ void LoadXmlConfigAction::common()
  }
  return fileChooser->getSelectedFile();
 }
+
+// initialize logging
+/*private*/ /*final*/ /*static*/ Logger* LoadXmlConfigAction::log = LoggerFactory::getLogger("LoadXmlConfigAction");

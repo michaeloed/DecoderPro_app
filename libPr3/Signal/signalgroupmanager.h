@@ -35,14 +35,15 @@
  Q_OBJECT
 public:
     SignalGroupManager(QObject* parent = 0) : AbstractManager(parent) {}
+    SignalGroupManager(SystemConnectionMemo*, QObject* parent = 0) : AbstractManager(memo, parent) {}
     ~SignalGroupManager() {}
     SignalGroupManager(const SignalGroupManager&) : AbstractManager() {}
     /*public*/ virtual SignalGroup* getSignalGroup(QString /*name*/) {return nullptr;}
 
-    /*public*/ SignalGroup* getBySystemName(QString name)const override {return (SignalGroup* ) AbstractManager::getBeanBySystemName(name);}
+    /*public*/ SignalGroup* getBySystemName(QString name)const {return (SignalGroup* ) AbstractManager::getBeanBySystemName(name);}
 
 
-    /*public*/ SignalGroup* getByUserName(QString name)const override{return (SignalGroup* )AbstractManager::getBeanByUserName(name);}
+    /*public*/ SignalGroup* getByUserName(QString name)const {return (SignalGroup* )AbstractManager::getBeanByUserName(name);}
 
     /*public*/ virtual SignalGroup* newSignalGroup(QString /*sys*/) {return nullptr;}
 

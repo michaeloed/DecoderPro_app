@@ -224,11 +224,11 @@ public:
 
     /*public*/ int getLinkType();
     /*public*/ void setLinkType(int type);
-    /*public*/ TurnoutType getTurnoutType();
-    /*public*/ static bool isTurnoutTypeTurnout(TurnoutType type);
-    /*public*/ bool isTurnoutTypeTurnout();
+    /*public*/ TurnoutType getTurnoutType() const;
+    /*public*/ static bool isTurnoutTypeTurnout(TurnoutType type) ;
+    /*public*/ bool isTurnoutTypeTurnout() const;
     /*public*/ static bool isTurnoutTypeXover(TurnoutType type);
-    /*public*/ bool isTurnoutTypeXover();
+    /*public*/ bool isTurnoutTypeXover() const;
     /*public*/ static bool isTurnoutTypeSlip(TurnoutType type);
     /*public*/ bool isTurnoutTypeSlip();
     /*public*/ static bool hasEnteringSingleTrack(TurnoutType type);
@@ -256,9 +256,9 @@ public:
     /*public*/ void setConnectC(LayoutTrack *o, int type);
     /*public*/ void setConnectD(LayoutTrack* o,int type);
     /*public*/ LayoutBlock* getLayoutBlock() const;
-    /*public*/ LayoutBlock* getLayoutBlockB();
-    /*public*/ LayoutBlock* getLayoutBlockC() ;
-    /*public*/ LayoutBlock* getLayoutBlockD();
+    /*public*/ LayoutBlock* getLayoutBlockB() const;
+    /*public*/ LayoutBlock* getLayoutBlockC() const ;
+    /*public*/ LayoutBlock* getLayoutBlockD() const;
 //    /*public*/ QPointF getCoordsCenter();
     /*public*/ QPointF getCoordsA();
     /*public*/ QPointF getCoordsB();
@@ -445,12 +445,12 @@ private slots:
  void redrawPanel();
  //void on_viewRoutingAct_triggered();
  void on_additionalTurnout_toggled(bool);
- void turnoutEditBlockPressed(ActionEvent* a = 0);
- void turnoutEditBlockBPressed(ActionEvent* a = 0);
- void turnoutEditBlockCPressed(ActionEvent* a = 0);
- void turnoutEditBlockDPressed(ActionEvent* a = 0);
- void turnoutEditDonePressed(ActionEvent* a = 0);
- void turnoutEditCancelPressed(ActionEvent* a = 0);
+ void turnoutEditBlockPressed(JActionEvent* a = 0);
+ void turnoutEditBlockBPressed(JActionEvent* a = 0);
+ void turnoutEditBlockCPressed(JActionEvent* a = 0);
+ void turnoutEditBlockDPressed(JActionEvent* a = 0);
+ void turnoutEditDonePressed(JActionEvent* a = 0);
+ void turnoutEditCancelPressed(JActionEvent* a = 0);
  void on_blockNameField_textEdited(QString);
  void on_blockBNameField_textEdited(QString);
  void on_blockCNameField_textEdited(QString);

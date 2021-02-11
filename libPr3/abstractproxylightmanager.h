@@ -20,8 +20,8 @@ class LIBPR3SHARED_EXPORT AbstractProxyLightManager :  public LightManager, publ
      * Returns a list of all managers, including the
      * internal manager.  This is not a live list.
      */
-    /*public*/ QList<Manager*> getManagerList() override;
-    /*public*/ QList<Manager*> getDisplayOrderManagerList() override;
+    /*public*/ QList<Manager*> getManagerList() const override;
+    /*public*/ QList<Manager*> getDisplayOrderManagerList() const override;
     /*public*/ Manager* getInternalManager() const;
     /*public*/ Manager* getDefaultManager()const override;
     /*public*/ void addManager(Manager* m) override;
@@ -155,8 +155,8 @@ class LIBPR3SHARED_EXPORT AbstractProxyLightManager :  public LightManager, publ
      */
     virtual/*abstract protected*/ NamedBean* makeBean(int, QString /*systemName*/, QString /*userName*/) /*const*/ /*=0*/;
 
-    /*public*/ NamedBean* getBySystemName(/*@Nonnull */ QString systemName) const override;
-    /*public*/ NamedBean *getByUserName(/*@Nonnull*/ QString userName) const override;
+    /*public*/ Light* getBySystemName(/*@Nonnull */ QString systemName) const override;
+    /*public*/ Light *getByUserName(/*@Nonnull*/ QString userName) const override;
 
     /**
      * Find the index of a matching manager.

@@ -307,7 +307,10 @@ int File::getPrefixLength() {
   {
 //   this->path = fs.resolve(fs.normalize(parent),
 //                                   fs.normalize(child));
-      this->path = QFileInfo(parent).absoluteFilePath() /*+ pathSeparator*/ + /*QFileInfo(child).canonicalFilePath()*/child;
+   if(QFileInfo(parent).absoluteFilePath().endsWith(pathSeparator))
+    this->path = QFileInfo(parent).absoluteFilePath() + child;
+   else
+    this->path = QFileInfo(parent).absoluteFilePath() + pathSeparator + /*QFileInfo(child).canonicalFilePath()*/child;
   }
  }
  else
@@ -2211,8 +2214,15 @@ int File::getPrefixLength() {
  if (dest == nullptr) {
   throw NullPointerException();
  }
- QFile qFile(dest->getPath());
- return qFile.rename(dest->fileName());
+ if(dest->exists())
+  throw IOException(tr("backup file %1 exists").arg(dest->getPath()));
+ QFile qFile(getPath());
+ bool bRslt  = qFile.rename(dest->getPath());
+ if(!bRslt)
+ {
+  throw IOException(tr("backup of %1 to %2 failed: %3").arg(getPath()).arg(dest->fileName()).arg(qFile.errorString()));
+ }
+ return bRslt;
 }
 
 #if 0

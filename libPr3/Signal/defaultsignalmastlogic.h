@@ -56,6 +56,8 @@ public:
     /*public*/ bool removeDestination(SignalMast* dest) override;
     /*public*/ void disableLayoutEditorUse() override;
     /*public*/ void useLayoutEditor(bool boo, SignalMast* destination) throw (JmriException) override;
+    /*public*/ int setupDirectionSensors() override;
+    /*public*/ void removeDirectionSensors() override;
     /*public*/ bool useLayoutEditor(SignalMast* destination) override;
     /*public*/ void useLayoutEditorDetails(bool turnouts, bool blocks, SignalMast* destination) throw (JmriException) override;
     /*public*/ bool useLayoutEditorTurnouts(SignalMast* destination);
@@ -129,16 +131,16 @@ private:
     QHash<SignalMast*, DestinationMast*> destList;// =  QHash<SignalMast*, DestinationMast*>();
     LayoutEditor* editor;
 
-    bool useAutoGenBlock;// = true;
-    bool useAutoGenTurnouts;// = true;
+    bool useAutoGenBlock = true;
+    bool useAutoGenTurnouts = true;
 
-    LayoutBlock* facingBlock;// = NULL;
-    LayoutBlock* protectingBlock;// = NULL;
+    LayoutBlock* facingBlock = NULL;
+    LayoutBlock* protectingBlock = NULL;
 
-    bool disposing;// = false;
-    Logger*log;
+    bool disposing = false;
+    static Logger* log;
     //PropertyChangeSupport* pcs;// = new jPropertyChangeSupport(this);
-    /*volatile*/ bool inWait;// = false;
+    /*volatile*/ bool inWait = false;
     QThread* thr;// = NULL;
     /*synchronized*/ void setSignalAppearance();
     QMutex mutex;

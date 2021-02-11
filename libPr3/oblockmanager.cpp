@@ -81,6 +81,19 @@ OBlockManager::OBlockManager(QObject *parent) :
 }
 
 /**
+ * Create a new OBlock using an automatically incrementing system
+ * name.
+ *
+ * @param userName the user name for the new OBlock
+ * @return null if an OBlock with the same systemName or userName already
+ *         exists, or if there is trouble creating a new OBlock.
+ */
+//@CheckForNull
+/*public*/ OBlock* OBlockManager::createNewOBlock(/*@Nonnull*/ QString userName) {
+    return createNewOBlock(getAutoSystemName(), userName);
+}
+
+/**
  * Method to get an existing OBlock.  First looks up assuming that
  *      name is a User Name.  If this fails looks up assuming
  *      that name is a System Name.  If both fail, returns NULL.
@@ -91,15 +104,15 @@ OBlockManager::OBlockManager(QObject *parent) :
     return (OBlock*)getBySystemName(name);
 }
 
-/*public*/ NamedBean *OBlockManager::getBySystemName(QString name) const {
+/*public*/ OBlock *OBlockManager::getBySystemName(QString name) const {
     if (name==NULL || name.trimmed().length()==0) { return NULL; }
     QString key = name.toUpper();
     return (OBlock*)_tsys->value(key);
 }
 
-/*public*/ NamedBean *OBlockManager::getByUserName(QString key)const  {
+/*public*/ OBlock *OBlockManager::getByUserName(QString key)const  {
     if (key==NULL || key.trimmed().length()==0) { return NULL; }
-    return _tuser->value(key);
+    return (OBlock*)_tuser->value(key);
 }
 //@Override
 /*public*/ OBlock* OBlockManager::provide(QString name) const throw (IllegalArgumentException) {

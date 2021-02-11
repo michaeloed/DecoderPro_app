@@ -69,7 +69,9 @@ const QString SpeedTableVarValue::VHIGH_CV = "5";
 /*public*/ SpeedTableVarValue::SpeedTableVarValue(QString name, QString comment, QString cvName,
                           bool readOnly, bool infoOnly, bool writeOnly, bool opsOnly,
                           QString cvNum, QString mask, int minVal, int maxVal,
-                          QMap<QString,CvValue*>* v, QLabel* status, QString stdname, int entries, bool mfxFlag, QObject *parent) : VariableValue(name, comment, cvName, readOnly, infoOnly, writeOnly, opsOnly, cvNum, mask, v, status, stdname, parent)
+                          QMap<QString,CvValue*>* v, JLabel* status, QString stdname, int entries,
+                                                  bool mfxFlag, QObject *parent)
+ : VariableValue(name, comment, cvName, readOnly, infoOnly, writeOnly, opsOnly, cvNum, mask, v, status, stdname, parent)
 
 {
  //super(name, comment, cvName, readOnly, infoOnly, writeOnly, opsOnly, cvNum, mask, v, status, stdname, parent);
@@ -134,11 +136,11 @@ const QString SpeedTableVarValue::VHIGH_CV = "5";
     return "Speed table";
 }
 
-/*public*/ QVector<CvValue*>* SpeedTableVarValue::usesCVs() {
-    QVector<CvValue*>* retval = new QVector<CvValue*>(numCvs);
+/*public*/ QVector<CvValue *> SpeedTableVarValue::usesCVs() {
+    QVector<CvValue*> retval = QVector<CvValue*>(numCvs);
     int i;
     for (i=0; i<numCvs; i++)
-        retval->replace(i, _cvMap->value(cvList->at(i)));
+        retval.replace(i, _cvMap->value(cvList->at(i)));
     return retval;
 }
 
@@ -358,7 +360,7 @@ void SpeedTableVarValue::setColor(QColor c) {
 {
  const int GRID_Y_BUTTONS = 3;
  QSignalMapper* mapper = new QSignalMapper;
- stepSliders = QList<JSlider*>();
+ //stepSliders = QList<JSlider*>();
  // put together a new panel in scroll pane
  QWidget* j = new QScrollArea();
 #if 1
@@ -375,11 +377,11 @@ void SpeedTableVarValue::setColor(QColor c) {
 
   CvValue* cv = _cvMap->value(cvList->at(i));
   JSlider* s = new VarSlider(models->at(i), cv, i+1);
-  stepSliders.append(s);
+  //stepSliders.append(s);
   s->setOrientation(/*JSlider.VERTICAL*/Qt::Vertical);
   //s.addChangeListener(this);
   mapper->setMapping(s, s);
-  connect(s, SIGNAL(sliderMoved(int)), mapper, SLOT(map()));
+  connect(s, SIGNAL(valueChanged(int)), mapper, SLOT(map()));
 
   int currentState = cv->getState();
   int currentValue = cv->getValue();
@@ -434,7 +436,7 @@ void SpeedTableVarValue::setColor(QColor c) {
  QPushButton* b;
  QHBoxLayout* layout = new QHBoxLayout(j);
  k->setLayout(layout);
- layout->addWidget(b = new  QPushButton(tr("ButtonForceStraight"),k));
+ layout->addWidget(b = new  QPushButton(tr("Force Straight"),k));
  b->setToolTip(tr("TooltipForceStraight"));
 //    b.addActionListener(new java.awt.event.ActionListener() {
 //            /*public*/ void actionPerformed(ActionEvent* /*e*/) {
@@ -442,7 +444,7 @@ void SpeedTableVarValue::setColor(QColor c) {
 //            }
 //        });
  connect(b, SIGNAL(clicked()), this, SLOT(doForceStraight()));
- layout->addWidget(b = new QPushButton(tr("ButtonMatchEnds"),k));
+ layout->addWidget(b = new QPushButton(tr("Match Ends"),k));
  b->setToolTip(tr("TooltipMatchEnds"));
 //    b.addActionListener(new java.awt.event.ActionListener() {
 //            /*public*/ void actionPerformed(ActionEvent* /*e*/) {
@@ -450,7 +452,7 @@ void SpeedTableVarValue::setColor(QColor c) {
 //            }
 //        });
  connect(b, SIGNAL(clicked()), this, SLOT(doMatchEnds()));
- layout->addWidget(b = new QPushButton(tr("ButtonConstantRatio"),k));
+ layout->addWidget(b = new QPushButton(tr("Constan Ratio"),k));
  b->setToolTip(tr("TooltipConstantRatio"));
 //    b.addActionListener(new java.awt.event.ActionListener() {
 //            /*public*/ void actionPerformed(ActionEvent* /*e*/) {
@@ -458,7 +460,7 @@ void SpeedTableVarValue::setColor(QColor c) {
 //            }
 //        });
  connect(b, SIGNAL(clicked()), this, SLOT(doRatioCurve()));
- layout->addWidget(b = new QPushButton(tr("ButtonLogCurve"),k));
+ layout->addWidget(b = new QPushButton(tr("Log Curve"),k));
  b->setToolTip(tr("TooltipLogCurve"));
 //    b.addActionListener(new java.awt.event.ActionListener() {
 //            /*public*/ void actionPerformed(ActionEvent* /*e*/) {
@@ -466,7 +468,7 @@ void SpeedTableVarValue::setColor(QColor c) {
 //            }
 //        });
  connect(b, SIGNAL(clicked()), this, SLOT(doLogCurve()));
- layout->addWidget(b = new QPushButton(tr("ButtonShiftLeft"),k));
+ layout->addWidget(b = new QPushButton(tr("Shift Left"),k));
  b->setToolTip(tr("TooltipShiftLeft"));
 //    b.addActionListener(new java.awt.event.ActionListener() {
 //            /*public*/ void actionPerformed(ActionEvent* /*e*/) {
@@ -474,7 +476,7 @@ void SpeedTableVarValue::setColor(QColor c) {
 //            }
 //        });
  connect(b, SIGNAL(clicked()), this, SLOT(doShiftLeft()));
- layout->addWidget(b = new QPushButton(tr("ButtonShiftRight"),k));
+ layout->addWidget(b = new QPushButton(tr("Shift Right"),k));
  b->setToolTip(tr("TooltipShiftRight"));
 //    b.addActionListener(new java.awt.event.ActionListener() {
 //            /*public*/ void actionPerformed(ActionEvent* /*e*/) {
@@ -575,7 +577,7 @@ void SpeedTableVarValue::initStepCheckBoxes() {
 /**
  * Set the values to a straight line from _min to _max
  */
-void SpeedTableVarValue::doForceStraight(ActionEvent* e) {
+void SpeedTableVarValue::doForceStraight(JActionEvent* e) {
     _cvMap->value(cvList->at(0))->setValue(_min);
     _cvMap->value(cvList->at(nValues-1))->setValue(_max);
     doMatchEnds(e);
@@ -583,7 +585,7 @@ void SpeedTableVarValue::doForceStraight(ActionEvent* e) {
 /**
  * Set the values to a straight line from existing ends
  */
-void SpeedTableVarValue::doMatchEnds(ActionEvent* /*e*/) {
+void SpeedTableVarValue::doMatchEnds(JActionEvent* /*e*/) {
     int first = _cvMap->value(cvList->at(0))->getValue();
     int last = _cvMap->value(cvList->at(nValues-1))->getValue();
     logit->debug(" first="+QString::number(first)+" last="+QString::number(last));
@@ -601,7 +603,7 @@ void SpeedTableVarValue::doMatchEnds(ActionEvent* /*e*/) {
 /**
  * Set a constant ratio curve
  */
-void SpeedTableVarValue::doRatioCurve(ActionEvent* /*e*/) {
+void SpeedTableVarValue::doRatioCurve(JActionEvent* /*e*/) {
     double first = _cvMap->value(cvList->at(0))->getValue();
     if (first<1.) first=1.;
     double last = _cvMap->value(cvList->at(nValues-1))->getValue();
@@ -622,7 +624,7 @@ void SpeedTableVarValue::doRatioCurve(ActionEvent* /*e*/) {
 /**
  * Set a log curve
  */
-void SpeedTableVarValue::doLogCurve(ActionEvent* /*e*/) {
+void SpeedTableVarValue::doLogCurve(JActionEvent* /*e*/) {
     double first = _cvMap->value(cvList->at(0))->getValue();
     double last = _cvMap->value(cvList->at(nValues-1))->getValue();
     if (last<first+1.) last = first+1.;
@@ -645,7 +647,7 @@ void SpeedTableVarValue::doLogCurve(ActionEvent* /*e*/) {
 /**
  * Shift the curve one CV to left.  The last entry is left unchanged.
  */
-void SpeedTableVarValue::doShiftLeft(ActionEvent* /*e*/) {
+void SpeedTableVarValue::doShiftLeft(JActionEvent* /*e*/) {
     for (int i = 0; i<nValues-1; i++) {
         int value = _cvMap->value(cvList->at(i)+1)->getValue();
         _cvMap->value(cvList->at(i))->setValue(value);
@@ -656,7 +658,7 @@ void SpeedTableVarValue::doShiftLeft(ActionEvent* /*e*/) {
 /**
  * Shift the curve one CV to right.  The first entry is left unchanged.
  */
-void SpeedTableVarValue::doShiftRight(ActionEvent* /*e*/)
+void SpeedTableVarValue::doShiftRight(JActionEvent* /*e*/)
 {
  for (int i = nValues-1; i>0; i--)
  {
@@ -847,8 +849,8 @@ void SpeedTableVarValue::writeNext() {
    {
     // this is the one, so use this i
     setModel(i, value);
-    if(i < stepSliders.count())
-     stepSliders.at(i)->setValue(value);
+//    if(i < stepSliders.count())
+//     stepSliders.at(i)->setValue(value);
     break;
    }
   }

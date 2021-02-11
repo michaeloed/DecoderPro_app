@@ -15,9 +15,10 @@ public:
     /*public*/ QString getSystemPrefix() const override;
     /*public*/ char typeLetter()const  override ;
     /*public*/ OBlock* createNewOBlock(QString systemName, QString userName);
+    /*public*/ OBlock* createNewOBlock(/*@Nonnull*/ QString userName);
     /*public*/ OBlock* getOBlock(QString name);
-    /*public*/ NamedBean* getBySystemName(QString name)const override;
-    /*public*/ NamedBean* getByUserName(QString key)const override;
+    /*public*/ OBlock* getBySystemName(QString name)const ;
+    /*public*/ OBlock* getByUserName(QString key)const ;
     /*public*/ OBlock* provideOBlock(QString name)const ;
     static OBlockManager* _instance;// = NULL;
     static /*public*/ OBlockManager* instance();

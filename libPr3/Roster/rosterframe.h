@@ -59,8 +59,8 @@ public:
     /*public*/ void hideGroupsPane(bool hide);
     /*public*/ QString getSelectedRosterGroup();
     /*public*/ QList<RosterEntry*>* getSelectedRosterEntries();
-    /*public*/ void setTitle(QString title) ;
-    /*public*/ QVariant getProperty(QString key);
+    /*public*/ void setTitle(QString title)  override;
+    /*public*/ QVariant getProperty(QString key) override;
     /*public*/ void setProgrammerLaunch(int buttonId, QString programmer, QString buttonText);
     /*public*/ void setSelectedRosterGroup(QString rosterGroup);
 
@@ -75,7 +75,7 @@ private:
     Ui::RosterFrame *ui;
     void common();
     Roster* roster;
-    RosterEntry* rosterEntry;
+    RosterEntry* re;
     QToolButton* newLoco;
     QToolButton* identifyLoco;
     QToolButton* togglePower;
@@ -83,7 +83,7 @@ private:
     JFrame* progFrame;
     QComboBox* cbProgrammers;
     ProgModeSelector* modePanel;
-    QComboBox* cbProgMode;
+    //QComboBox* cbProgMode;
     UserPreferencesManager* prefsMgr;
 //    ConnectionConfig* serModeProCon;// = NULL;
 //    ConnectionConfig* opsModeProCon;// = NULL;
@@ -91,14 +91,14 @@ private:
     QLabel* statusField;
     QLabel* serviceModeProgrammerLabel;
     QLabel* operationsModeProgrammerLabel;
-    QString programmer1; // "Comprehensive
-    QString programmer2; // "Basic"
+    QString programmer1 =  "Comprehensive";
+    QString programmer2 = "Basic";
     QVector<RosterEntry*> rows;
     QPushButton* prog2Button;
 
  Logger* log;
  bool inStartProgrammer;// = false;
- RosterEntryUpdateListener* rosterEntryUpdateListener;
+ RosterEntryUpdateListener* rosterEntryUpdateListener = nullptr;
 // void updateRow(int row, RosterEntry* re);
 // void updateDetails();
  bool bUpdating;
@@ -109,6 +109,7 @@ private:
 // JRadioButtonMenuItem contextOps = new JRadioButtonMenuItem(Bundle.getMessage("ProgrammingOnMain"));
 // JRadioButtonMenuItem contextService = new JRadioButtonMenuItem(Bundle.getMessage("ProgrammingTrack"));
  QSignalMapper* signalMapper;
+ int groupSplitPaneLocation = 0;
  RosterGroupsPanel* groups;
  QMenuBar* menuBar;// = new JMenuBar();
  void closeEvent(QCloseEvent *);
@@ -127,7 +128,7 @@ private:
  QAction* contextEdit;
  QList<RosterEntry*>* selectedRosterEntries;
  void editMediaButton();
- QString getClassName();
+ QString getClassName() override;
 
 private slots:
 //    void on_tableWidget_cellClicked(int row, int col);
@@ -147,7 +148,7 @@ private slots:
     void on_actionDelete_Loco_triggered();
 //    void on_tableWidget_cellChanged(int, int);
     void propertyChange(PropertyChangeEvent* e);
-    void On_cbProgrammers_currentIndexChanged(QString);
+//    void On_cbProgrammers_currentIndexChanged(QString);
     void updateProgMode();
     void On_splitterMoved(int, int);
     void On_splitter2Moved(int, int);
@@ -254,22 +255,24 @@ class MyIdentifyLoco : public IdentifyLoco
      who = me;
      this->programmer = programmer;
     }
+    QObject* self() {return (QObject*)this;}
+ signals:
+  void doneSignal(int dccAddress, bool bLongAddr, int cv8Val, int cv7Val);
 
 private:
  RosterFrame* who;// = me;
 
     //@Override
 protected:
- void done(int dccAddress)
+ void done(int dccAddress) override
  {
   // if Done, updated the selected decoder
    //who->selectLoco(dccAddress, !shortAddr, cv8val, cv7val);
   emit doneSignal(dccAddress, !shortAddr, cv8val, cv7val);
  }
-signals:
- void doneSignal(int dccAddress, bool bLongAddr, int cv8Val, int cv7Val);
+
  //@Override
- protected: void message(QString m)
+ protected: void message(QString m) override
  {
   who->statusField->setText(m);
  }
@@ -280,7 +283,7 @@ signals:
         //idloco.setSelected(false);
     }
 };
-#if 0
+#if 1
 class RosterEntryUpdateListener : public PropertyChangeListener
 {
  Q_OBJECT
@@ -296,7 +299,6 @@ protected:
 #endif
 /*static*/ class ExportRosterItem : public ExportRosterItemAction
 {
-
     /**
      *
      */
@@ -354,7 +356,7 @@ public:
  /*public*/ QString getClassName() {return "PaneProgFrameO1";}
 
 protected:
- QWidget* getModePane()
+ JPanel* getModePane()
  {
   return nullptr;
  }

@@ -201,6 +201,7 @@ public:
      * the user name and system name with quoation marks around the user name.
      */
     /*public*/ static /*final*/ QString QUOTED_NAME_FORMAT;// = "\"%1\" (%2)";
+    /*public*/ static /*final*/ QString PROPERTY_STATE;// = "state";
 
     /**
      * Display options for {@link #getDisplayName(DisplayOptions)}. The quoted
@@ -263,7 +264,7 @@ public:
          * Get a system-specific name.  This encodes the hardware addressing
          * information.
          */
-        virtual QString getSystemName() const =0;
+        virtual QString getSystemName() const {return QString();}//=0;
         /*
         * return user name if it exists, otherwise return System name
         */

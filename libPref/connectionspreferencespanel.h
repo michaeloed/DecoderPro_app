@@ -4,10 +4,12 @@
 #include "logger.h"
 #include "actionlistener.h"
 #include "libpref_global.h"
+#include <QEvent>
+#include <QToolButton>
+#include "jbutton.h"
 
-class QToolButton;
 class PropertyChangeEvent;
-class QPushButton;
+class JButton;
 class QCheckBox;
 class TabbedPreferences;
 class ImageIcon;
@@ -57,9 +59,9 @@ private:
     /*private*/ /*final*/ QIcon deleteIconRollOver;
     /*private*/ /*final*/ QSize deleteButtonSize;
     /*private*/ QIcon addIcon;
-    /*private*/ bool restartRequired;// = false;
+    /*private*/ bool restartRequired = false;
 
-    /*private*/ QList<JmrixConfigPane*> configPanes;// = QList<JmrixConfigPane*>();
+    /*private*/ QList<JmrixConfigPane*> configPanes = QList<JmrixConfigPane*>();
     void common();
     /*private*/ void activeTab();
     /*private*/ void addConnection(int tabPosition, /*final*/ JmrixConfigPane* configPane);
@@ -71,6 +73,7 @@ private:
     bool bDeleteFlag;
  friend class CloseButtonListener;
 };
+
 class DisableCheckboxListener : public ActionListener
 {
     Q_OBJECT
@@ -79,8 +82,9 @@ class DisableCheckboxListener : public ActionListener
 public:
     DisableCheckboxListener(JmrixConfigPane* configPane, QCheckBox* checkBox);
 public slots:
-    void actionPerformed(ActionEvent * = 0);
+    void actionPerformed(JActionEvent * = 0);
 };
+
 class CloseButtonListener : public ActionListener
 {
     Q_OBJECT
@@ -89,14 +93,8 @@ class CloseButtonListener : public ActionListener
 public:
     CloseButtonListener(int index, ConnectionsPreferencesPanel* parent);
 public slots:
-    void actionPerformed(ActionEvent * = 0);
+    void actionPerformed(JActionEvent * = 0);
 };
-//class MyTabWidget: public QTabWidget
-//{
-// Q_OBJECT
 
-// public:
-//  MyTabWidget(QWidget *parent = 0);
-//  void setTabButton(int, QToolButton*);
-//};
+
 #endif // CONNECTIONPREFERENCESPANEL_H

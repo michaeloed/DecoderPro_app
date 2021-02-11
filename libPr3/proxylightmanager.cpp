@@ -2,6 +2,7 @@
 #include "lightmanager.h"
 #include "internallightmanager.h"
 #include "internalsystemconnectionmemo.h"
+#include "meter.h"
 
 ProxyLightManager::ProxyLightManager(QObject *parent) :
     AbstractProxyLightManager(parent)
@@ -73,8 +74,8 @@ ProxyLightManager::ProxyLightManager(QObject *parent) :
  * instance already exists.
  * @return requested Light object or null if none exists
  */
-/*public*/ NamedBean *ProxyLightManager::getBySystemName(QString systemName) const {
-    return AbstractProxyLightManager::getBeanBySystemName(systemName);
+/*public*/ Light *ProxyLightManager::getBySystemName(QString systemName) const {
+    return (Light*)AbstractProxyLightManager::getBeanBySystemName(systemName);
 }
 
 /**
@@ -82,7 +83,7 @@ ProxyLightManager::ProxyLightManager(QObject *parent) :
  * instance already exists.
  * @return requested Turnout object or null if none exists
  */
-/*public*/ NamedBean *ProxyLightManager::getByUserName(QString userName) const {
+/*public*/ Light *ProxyLightManager::getByUserName(QString userName) const {
     return (Light*) AbstractProxyLightManager::getBeanByUserName(userName);
 }
 

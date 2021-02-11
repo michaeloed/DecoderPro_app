@@ -52,7 +52,7 @@ class JTextField;
 class JmriJFrame;
 class PickFrame;
 class LogixManager;
-class ActionEvent;
+class JActionEvent;
 class ConditionalManager;
 class LIBTABLESSHARED_EXPORT LogixTableAction : public AbstractTableAction
 {
@@ -373,7 +373,7 @@ class LIBTABLESSHARED_EXPORT RefDialog : public JDialog
 public:
     RefDialog(BeanTableFrame* frame, LogixTableAction* action);
 public slots:
-    void deviceReportPressed(ActionEvent* e = 0);
+    void deviceReportPressed(JActionEvent* e = 0);
 };
 
 class LIBTABLESSHARED_EXPORT LogixTableModel : public BeanTableDataModel
@@ -443,23 +443,23 @@ public:
 };
 
 
-class ItemDelegate : public QAbstractItemDelegate
-{
-  Q_OBJECT
- public:
-  ItemDelegate(QStringList items, QObject *parent);
-  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override ;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-private:
-  QStringList Items;
-  //int row;
-signals:
-private slots:
-};
+//class ItemDelegate : public QAbstractItemDelegate
+//{
+//  Q_OBJECT
+// public:
+//  ItemDelegate(QStringList items, QObject *parent);
+//  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+//    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+//    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override ;
+//    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+//    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+//    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+//private:
+//  QStringList Items;
+//  //int row;
+//signals:
+//private slots:
+//};
 
 class CrossReferenceActionListener : public ActionListener
 {

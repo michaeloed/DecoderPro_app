@@ -52,8 +52,8 @@ public:
      * @param userName System Name of the required NamedBean
      * @return requested NamedBean object or NULL if none exists
      */
-    /*public*/  NamedBean* getBeanByUserName(QString userName)const override;
-    /*public*/ NamedBean* getByUserName(/*@Nonnull*/ QString userName) const override;
+//    /*public*/  NamedBean* getBeanByUserName(QString userName)const override;
+//    /*public*/ NamedBean* getByUserName(/*@Nonnull*/ QString userName) const override;
 
     /**
      * Locate an instance based on a name.  Returns NULL if no
@@ -122,9 +122,9 @@ public:
 //    /*public*/ QString makeSystemName(/*@Nonnull*/ QString s);
 //    /*public*/ QString makeSystemName(/*@Nonnull*/ QString s, bool logErrors);
     /*public*/ QString makeSystemName(/*@Nonnull*/ QString s, bool logErrors = true, QLocale locale = QLocale()) const override;
-    /*public*/ virtual SystemConnectionMemo* getMemo()const;
-    /*public*/ NamedBean* getBySystemName(/*@Nonnull*/ QString systemName) const override;
-    /*public*/ void updateAutoNumber(QString systemName);
+    /*public*/ virtual SystemConnectionMemo* getMemo() const;
+//    /*public*/ NamedBean* getBySystemName(/*@Nonnull*/ QString systemName) const override;
+    /*public*/ void updateAutoNumber(QString systemName) const;
     /*public*/ QString getAutoSystemName()const;
 
 
@@ -168,6 +168,10 @@ friend class RpsReporterManager;
 friend class RpsSensorManager;
 friend class InternalLightManager;
 friend class InternalReporterManager;
+friend class InternalMeterManager;
+friend class DefaultRouteManager;
+friend class SignalGroupManager;
+friend class DefaultSignalGroupManager;
 protected:
 /**
  * Locate an instance based on a system name.  Returns NULL if no

@@ -521,7 +521,7 @@ void SectionTableAction::addEditPressed()
 //        addFrameLayout->add(p33);
 //        p33->setVisible(true);
   addFrameLayout->addWidget(entryPointTable);
-  entryPointTable->setItemDelegateForColumn(EntryPointTableModel::DIRECTION_COLUMN, new ItemDelegate(dirList,this));
+  entryPointTable->setItemDelegateForColumn(EntryPointTableModel::DIRECTION_COLUMN, new JComboBoxEditor(dirList,this));
   entryPointTable->resizeColumnsToContents();
 //        JPanel p34 = new JPanel();
 //        p34.setLayout(new FlowLayout());
@@ -1195,7 +1195,7 @@ YesButtonActionListener::YesButtonActionListener(JDialog* dlg, Section *s)
  this->s = s;
 }
 
-void YesButtonActionListener::actionPerformed(ActionEvent* )
+void YesButtonActionListener::actionPerformed(JActionEvent* )
 {
  ((SectionManager*)InstanceManager::getDefault("SectionManager"))->deregister(s);
  s->dispose();
@@ -1206,7 +1206,7 @@ NoButtonActionListener::NoButtonActionListener(JDialog* dlg)
  this->dlg = dlg;
 }
 
-void NoButtonActionListener::actionPerformed(ActionEvent*)
+void NoButtonActionListener::actionPerformed(JActionEvent*)
 {
  dlg->close();
 }
@@ -1587,11 +1587,11 @@ this->act = act;
     this->act = act;
 }
 
-///*public*/ Class<?> getColumnClass(int c) {
-//    if (c == DIRECTION_COLUMN)
-//        return JComboBox.class;
-//    return String.class;
-//}
+/*public*/ QString EntryPointTableModel::getColumnClass(int c) {
+    if (c == DIRECTION_COLUMN)
+        return "JComboBox";
+    return "String";
+}
 
 /*public*/ int EntryPointTableModel::columnCount(const QModelIndex &/*parent*/) const
 {

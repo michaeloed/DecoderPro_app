@@ -163,11 +163,12 @@ QObject* AbstractManager::getInstanceBySystemName(QString systemName)
 QObject* AbstractManager::getInstanceByUserName(QString userName) {
     return _tuser->value(userName);
 }
+
 /** {@inheritDoc} */
-//@Override
-/*public*/ NamedBean* AbstractManager::getBySystemName(/*@Nonnull*/ QString systemName) const {
-    return _tsys->value(systemName);
-}
+////@Override
+///*public*/ NamedBean* AbstractManager::getBySystemName(/*@Nonnull*/ QString systemName) const {
+//    return _tsys->value(systemName);
+//}
     /**
      * Locate an instance based on a system name.  Returns NULL if no
      * instance already exists.
@@ -178,23 +179,24 @@ QObject* AbstractManager::getInstanceByUserName(QString userName) {
         return _tsys->value(systemName);
     }
 
-    /**
-     * Locate an instance based on a user name.  Returns NULL if no
-     * instance already exists.
-     * @param userName System Name of the required NamedBean
-     * @return requested NamedBean object or NULL if none exists
-     */
-    /*public*/ NamedBean* AbstractManager::getBeanByUserName(QString userName) const{
-        return _tuser->value(userName);
-    }
+//    /**
+//     * Locate an instance based on a user name.  Returns NULL if no
+//     * instance already exists.
+//     * @param userName System Name of the required NamedBean
+//     * @return requested NamedBean object or NULL if none exists
+//     */
+//    /*public*/ NamedBean* AbstractManager::getBeanByUserName(QString userName) const{
+//        return _tuser->value(userName);
+//    }
 
-    /** {@inheritDoc} */
-//    @Override
-//    @CheckForNull
-    /*public*/ NamedBean* AbstractManager::getByUserName(/*@Nonnull*/ QString userName) const{
-        QString normalizedUserName = NamedBean::normalizeUserName(userName);
-        return !normalizedUserName.isNull() ? _tuser->value(normalizedUserName) : nullptr;
-    }
+//    /** {@inheritDoc} */
+////    @Override
+////    @CheckForNull
+//    /*public*/ NamedBean* AbstractManager::getByUserName(/*@Nonnull*/ QString userName) const{
+//        QString normalizedUserName = NamedBean::normalizeUserName(userName);
+//        return !normalizedUserName.isNull() ? _tuser->value(normalizedUserName) : nullptr;
+//    }
+
     /**
      * Locate an instance based on a name.  Returns NULL if no
      * instance already exists.
@@ -790,7 +792,7 @@ QHash<QString, NamedBean*>* AbstractManager::getSystemNameHash()
     emit notifyIntervalRemoved(e);
 }
 
-/*public*/ void AbstractManager::updateAutoNumber(QString systemName) {
+/*public*/ void AbstractManager::updateAutoNumber(QString systemName) const{
     /* The following keeps track of the last created auto system name.
      currently we do not reuse numbers, although there is nothing to stop the
      user from manually recreating them */

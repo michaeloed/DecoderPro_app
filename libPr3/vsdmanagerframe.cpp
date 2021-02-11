@@ -19,9 +19,7 @@
 #include "windowmenu.h"
 #include <QCloseEvent>
 #include "loadvsdfileaction.h"
-#include "loadxmlvsdecoderaction.h"
 #include "vsdpreferencesaction.h"
-#include "storexmlvsdecoderaction.h"
 
 //VSDManagerFrame::VSDManagerFrame(QWidget *parent) :
 //  JmriJFrame(parent)
@@ -244,7 +242,7 @@
 /**
  * Handle "Close" button press
  */
-/*protected*/ void VSDManagerFrame::closeButtonPressed(ActionEvent* /*e*/) {
+/*protected*/ void VSDManagerFrame::closeButtonPressed(JActionEvent* /*e*/) {
  firePropertyChange(CLOSE_WINDOW, QVariant(), QVariant());
     dispose();
 }
@@ -252,7 +250,7 @@
 /**
  * Handle "Mute" button press
  */
-/*protected*/ void VSDManagerFrame::muteButtonPressed(ActionEvent* e) {
+/*protected*/ void VSDManagerFrame::muteButtonPressed(JActionEvent* e) {
     JToggleButton* b = (JToggleButton*) e->getSource();
     log->debug("Mute button pressed. value = " + b->isSelected());
     firePropertyChange(MUTE, !b->isSelected(), b->isSelected());
@@ -261,7 +259,7 @@
 /**
  * Handle "Add" button press
  */
-/*protected*/ void VSDManagerFrame::addButtonPressed(ActionEvent* /*e*/) {
+/*protected*/ void VSDManagerFrame::addButtonPressed(JActionEvent* /*e*/) {
     log->debug("Add button pressed");
     config = new VSDConfig(); // Create a new Config for the new VSDecoder.
     // Do something here.  Create a new VSDecoder and add it to the window.
@@ -378,10 +376,6 @@
     //fileMenu.setMnemonic(Mnemonics.get("FileMenu"));
 
     fileMenu->addAction(new LoadVSDFileAction(tr("Load VSD File"),this));
-    QAction* storeXmlVSDecoderAction;
-    fileMenu->addAction(storeXmlVSDecoderAction = new StoreXmlVSDecoderAction(tr("Save VSDecoder Profiles"),this));
-    QAction* loadXmlVSDecoderAction;
-    fileMenu->addAction(loadXmlVSDecoderAction = new LoadXmlVSDecoderAction(tr("Load VSDecoder Profiles"),this));
 
     QMenu* editMenu = new QMenu(tr("Edit"));
     //editMenu.setMnemonic(Mnemonics.get("EditMenu"));
@@ -390,8 +384,6 @@
 
 //        fileMenu->getItem(1).setEnabled(false); // disable XML store
 //        fileMenu.getItem(2).setEnabled(false); // disable XML load
-    storeXmlVSDecoderAction->setEnabled(false);
-    loadXmlVSDecoderAction->setEnabled(false);
 
     menuList = QList<QMenu*>(/*3*/);
 

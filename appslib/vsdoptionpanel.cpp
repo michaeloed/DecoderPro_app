@@ -1,5 +1,4 @@
 #include "vsdoptionpanel.h"
-#include "vsdecoderpane.h"
 #include <QGridLayout>
 #include <QBoxLayout>
 #include <QLabel>
@@ -101,7 +100,7 @@ QGridLayout* g = new QGridLayout(this);
     g->addWidget(y,2,1,0,0);
 }
 
-/*public*/ void VSDOptionPanel::opsTrainSelectAction(ActionEvent* /*e*/) {
+/*public*/ void VSDOptionPanel::opsTrainSelectAction(JActionEvent* /*e*/) {
 #if 0
 if (opsTrainComboBox->itemData(opsTrainComboBox->currentIndex()) != QVariant()) {
         if (selected_train != NULL) {

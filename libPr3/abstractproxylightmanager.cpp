@@ -12,12 +12,13 @@
 #include "lnturnoutmanager.h"
 #include "loggerfactory.h"
 #include "namedbeancomparator.h"
+#include "defaultsystemconnectionmemo.h"
 
 // NOTE: This class is a replacement for AbstractProxyManager that
 // implements LightManager instead of AbstractManager
 
 AbstractProxyLightManager::AbstractProxyLightManager(QObject *parent)
-    : LightManager(new SystemConnectionMemo(), parent)
+    : LightManager(new DefaultSystemConnectionMemo(), parent)
 {
  mgrs = QList<Manager*>();
  internalManager = nullptr;
@@ -80,7 +81,7 @@ AbstractProxyLightManager::AbstractProxyLightManager(QObject *parent)
  * Returns a list of all managers, including the
  * internal manager.  This is not a live list.
  */
-/*public*/ QList<Manager*> AbstractProxyLightManager::getManagerList()
+/*public*/ QList<Manager*> AbstractProxyLightManager::getManagerList() const
 {
  // make sure internal present
  initInternal();
@@ -94,7 +95,7 @@ AbstractProxyLightManager::AbstractProxyLightManager(QObject *parent)
  *
  * @return the list of managers
  */
-/*public*/ QList<Manager*> AbstractProxyLightManager::getDisplayOrderManagerList() {
+/*public*/ QList<Manager*> AbstractProxyLightManager::getDisplayOrderManagerList() const {
     // make sure internal present
     initInternal();
 
@@ -274,26 +275,26 @@ AbstractProxyLightManager::AbstractProxyLightManager(QObject *parent)
 //@Override
 //@CheckReturnValue
 //@CheckForNull
-/*public*/ NamedBean *AbstractProxyLightManager::getBySystemName(/*@Nonnull */ QString systemName) const {
+/*public*/ Light *AbstractProxyLightManager::getBySystemName(/*@Nonnull */ QString systemName) const {
     // System names can be matched to managers by system and type at front of name
     int index = matchTentative(systemName);
     if (index >= 0) {
         Manager* m = getMgr(index);
-        return (NamedBean*)m->getBySystemName(systemName);
+        return (Light*)((AbstractLightManager*)m)->getBySystemName(systemName);
     }
     log->debug(tr("getBySystemName did not find manager from name %1, defer to default manager").arg(systemName)); // NOI18N
-    return (NamedBean*)getDefaultManager()->getBySystemName(systemName);
+    return (Light*)((AbstractLightManager*)getDefaultManager())->getBySystemName(systemName);
 }
 
 /** {@inheritDoc} */
 //@Override
 //@CheckReturnValue
 //@CheckForNull
-/*public*/ NamedBean* AbstractProxyLightManager::getByUserName(/*@Nonnull*/ QString userName) const{
+/*public*/ Light* AbstractProxyLightManager::getByUserName(/*@Nonnull*/ QString userName) const{
     for (Manager* m : this->mgrs) {
-        NamedBean* b = m->getByUserName(userName);
+        NamedBean* b = ((AbstractLightManager*)m)->getByUserName(userName);
         if (b != nullptr) {
-            return (NamedBean*)b;
+            return (Light*)b;
         }
     }
     return nullptr;

@@ -31,6 +31,7 @@
 #include "mockshutdownmanager.h"
 #include "jmriuserinterfaceconfigurationprovider.h"
 #include "debugprogrammermanager.h"
+#include "blockmanager.h"
 
 JUnitUtil::JUnitUtil(QObject *parent) : QObject(parent)
 {
@@ -407,6 +408,32 @@ JUnitUtil::JUnitUtil(QObject *parent) : QObject(parent)
  }
 }
 
+/*static*/ /*public*/ void JUnitUtil::waitFor(bool (*condition)(), QString name,
+                                              QString file, int line)
+{
+
+ int delay = 0;
+ try
+ {
+  while (delay < WAITFOR_MAX_DELAY)
+  {
+   if ((*condition)())
+   {
+    log->debug(tr("return delay = %1").arg(delay));
+    return;
+   }
+   SleeperThread::msleep(WAITFOR_DELAY_STEP);
+   delay += WAITFOR_DELAY_STEP;
+   qApp->processEvents();
+  }
+
+  Assert::fail("\"" + name + "\" did not occur in time", file, line);
+ }
+ catch (Exception ex)
+ {
+  Assert::fail("Exception while waiting for \"" + name + "\" " + ex.getMessage(), file, line);
+ }
+}
 /**
  * Wait for a specific condition to be true, without having to wait longer
  * <p>
@@ -504,7 +531,7 @@ JUnitUtil::JUnitUtil(QObject *parent) : QObject(parent)
         return;
     }
 }
-#if 0
+
 /**
  * Wait for a specific condition to be true, without having to wait longer
  * <p>
@@ -518,34 +545,37 @@ JUnitUtil::JUnitUtil(QObject *parent) : QObject(parent)
  * @param name      name of condition being waited for; will appear in
  *                  Assert.fail if condition not true fast enough
  */
-static /*public*/ void fasterWaitFor(ReleaseUntil condition, String name) {
-    if (javax.swing.SwingUtilities.isEventDispatchThread()) {
-        log.error("Cannot use waitFor on Swing thread", new Exception());
-        return;
-    }
+/*static*/ /*public*/ bool JUnitUtil::fasterWaitFor(ReleaseUntil* condition, QString name, QString file, int line){
+//    if (javax.swing.SwingUtilities.isEventDispatchThread()) {
+//        log.error("Cannot use waitFor on Swing thread", new Exception());
+//        return;
+//    }
     int delay = 0;
     try {
         while (delay < 1000) {
-            if (condition.ready()) {
-                return;
+            if (condition->ready()) {
+                return true;
             }
-            int priority = Thread.currentThread().getPriority();
-            try {
-                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                Thread.sleep(5);
-                delay += 5;
-            } catch (InterruptedException e) {
-                Assert.fail("failed due to InterruptedException");
-            } finally {
-                Thread.currentThread().setPriority(priority);
-            }
+//            int priority = Thread.currentThread().getPriority();
+//            try {
+//                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+//                Thread.sleep(5);
+//                delay += 5;
+//            } catch (InterruptedException e) {
+//                Assert.fail("failed due to InterruptedException");
+//            } finally {
+//                Thread.currentThread().setPriority(priority);
+//            }
+            SleeperThread::msleep(5);
+            delay += 5;
+            qApp->processEvents();
         }
-        Assert.fail("\"" + name + "\" did not occur in time");
+        Assert::fail("\"" + name + "\" did not occur in time", file, line);
     } catch (Exception ex) {
-        Assert.fail("Exception while waiting for \"" + name + "\" " + ex);
+        Assert::fail("Exception while waiting for \"" + name + "\" " + ex.getMessage(), file, line);
     }
 }
-
+#if 0
 /**
  * Wait at most 1 second for a specific condition to be true, without having to wait longer
  * <p>
@@ -726,6 +756,14 @@ static /*public*/ void setBeanStateAndWait(NamedBean bean, int state) {
     }
 }
 
+/*public*/ /*static*/ void JUnitUtil::deregisterBlockManagerShutdownTask() {
+        if (! InstanceManager::isInitialized("ShutDownManager")) return;
+        if (! InstanceManager::isInitialized("BlockManager")) return;
+
+        ((ShutDownManager*)InstanceManager
+                ::getDefault("ShutDownManager"))
+                ->deregister(((BlockManager*)InstanceManager::getDefault("BlockManager"))->shutDownTask);
+    }
 /*public*/ /*static*/ void JUnitUtil::initWarrantManager() {
     WarrantManager* w = new WarrantManager();
     if (InstanceManager::getNullableDefault("ConfigureManager") != nullptr) {

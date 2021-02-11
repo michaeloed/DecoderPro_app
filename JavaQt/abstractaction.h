@@ -13,6 +13,7 @@ class JAVAQTSHARED_EXPORT AbstractAction : public Action
 public:
  //explicit AbstractAction(QObject *parent = 0);
  /*public*/  AbstractAction(QObject *parent = 0);
+ /*public*/  AbstractAction(const AbstractAction&)  {}
  static bool shouldReconfigure(PropertyChangeEvent* e);
  static void setEnabledFromAction(QWidget* c, Action* a);
  static void setToolTipTextFromAction(QWidget* c, Action* a);
@@ -34,7 +35,7 @@ signals:
  void propertyChange(PropertyChangeEvent*);
 
 public slots:
- virtual void actionPerformed(ActionEvent* = 0) {}
+ virtual void actionPerformed(JActionEvent* = 0) {}
 
 private:
  /*private*/ static bool RECONFIGURE_ON_NULL;

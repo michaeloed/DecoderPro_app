@@ -68,10 +68,10 @@ AbstractTableTabAction::~AbstractTableTabAction()
   AbstractTableAction* a = getNewTableAction("All");
   Q_UNUSED(a);
   tabbedTableArray.append(new TabbedTableItem("All", true, getManager(), getNewTableAction("All")));
-  for(int x = 0; x<managerList.size(); x++)
+  for(Manager* manager : managerList)
   {
-   QString manuName = ConnectionNameFromSystemName::getConnectionName(managerList.at(x)->getSystemPrefix());
-   TabbedTableItem* itemModel = new TabbedTableItem(manuName, true, managerList.at(x), getNewTableAction(manuName));
+   QString manuName = manager->getMemo()->getUserName();
+   TabbedTableItem* itemModel = new TabbedTableItem(manuName, true, manager, getNewTableAction(manuName));
    tabbedTableArray.append(itemModel);
   }
  }
@@ -133,7 +133,7 @@ void AbstractTableTabAction::On_dataTabs_currentChanged(int iTab)
     log->warn("This should not have happened");
 }
 
-void AbstractTableTabAction::actionPerformed(ActionEvent */*e*/)
+void AbstractTableTabAction::actionPerformed(JActionEvent */*e*/)
 {
  if(currFrame() != nullptr)
  {
@@ -268,6 +268,7 @@ void TabbedTableItem::createDataModel()
  dataTable->setSortingEnabled(true);
  //sorter.setTableHeader(dataTable.getTableHeader());
  //dataScroll	= new JScrollPane(dataTable);
+ dataTable->resizeRowsToContents();
 
 //        try {
 //            TableSorter tmodel = ((TableSorter)dataTable.getModel());

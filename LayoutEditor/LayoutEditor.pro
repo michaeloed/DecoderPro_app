@@ -380,7 +380,6 @@ SOURCES += \
     speedometeraction.cpp \
     sendpacketaction.cpp \
     sendpacketframe.cpp \
-    vsdconfigpanel.cpp \
     vsdconfigdialog.cpp \
     vsdcontrol.cpp \
     busydialog.cpp \
@@ -539,7 +538,11 @@ SOURCES += \
     layouteditorcomponent.cpp \
     entergridsizesdialog.cpp \
     moveselectiondialog.cpp \
-    ../JavaQt/jradiobuttonmenuitem.cpp
+    ../JavaQt/jradiobuttonmenuitem.cpp \
+    blockbosslogicprovider.cpp \
+    createxmlfiles.cpp \
+    hitpointtype.cpp \
+    abstractnamedbeanmanager.cpp
 
 HEADERS += liblayouteditor_global.h \
     jmrijframeinterface.h \
@@ -832,7 +835,6 @@ HEADERS += liblayouteditor_global.h \
     speedometeraction.h \
     sendpacketaction.h \
     sendpacketframe.h \
-    vsdconfigpanel.h \
     vsdconfigdialog.h \
     vsdcontrol.h \
     busydialog.h \
@@ -997,7 +999,11 @@ HEADERS += liblayouteditor_global.h \
     layouteditorcomponent.h \
     entergridsizesdialog.h \
     moveselectiondialog.h \
-    ../JavaQt/jradiobuttonmenuitem.h
+    ../JavaQt/jradiobuttonmenuitem.h \
+    blockbosslogicprovider.h \
+    createxmlfiles.h \
+    hitpointtype.h \
+    abstractnamedbeanmanager.h
 
 FORMS    += \
     createeditblock.ui \

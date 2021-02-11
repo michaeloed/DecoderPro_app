@@ -13,7 +13,7 @@
 #include "jlist.h"
 #include <QMenu>
 #include <QMenuBar>
-#include "savemenu.h"
+#include "storemenu.h"
 #include <QPushButton>
 #include <QStatusBar>
 #include <QGridLayout>
@@ -21,6 +21,7 @@
 #include "namedbeanpropertydescriptor.h"
 #include <QCheckBox>
 #include "flowlayout.h"
+#include "guilafpreferencesmanager.h"
 
 //ListedTableFrame::ListedTableFrame()
 //{
@@ -91,6 +92,9 @@ void ListedTableFrame::common()
   addTable("jmri.jmrit.beantable.LRouteTableAction", tr("LRoute Table"), true);
   addTable("jmri.jmrit.beantable.LogixTableAction", tr("Logix Table"), true);
   addTable("jmri.jmrit.beantable.BlockTableAction", tr("Block Table"), true);
+  if (((GuiLafPreferencesManager*)InstanceManager::getDefault("GuiLafPreferencesManager"))->isOblockEditTabbed()) { // select _tabbed in prefs
+      addTable("jmri.jmrit.beantable.OBlockTableAction", tr("MenuItemOBlockTable"), false);
+  } // requires restart after changing the interface setting (on Display tab)
   addTable("jmri.jmrit.beantable.SectionTableAction", tr("Section Table"), true);
   addTable("jmri.jmrit.beantable.TransitTableAction", tr("Transit Table"), true);
   addTable("jmri.jmrit.beantable.AudioTableAction", tr("Audio Table"), false);
@@ -101,7 +105,7 @@ void ListedTableFrame::common()
 
 /*public*/ void ListedTableFrame::initComponents()
 {
- JmriJFrame::initComponents();
+ //JmriJFrame::initComponents();
 
 
  actionList = new ActionJList(currTableIndex, this);
@@ -276,27 +280,29 @@ void ListedTableFrame::buildMenus(/*final*/ LTFTabbedTableItem* item)
 //    });
     connect(newItem, SIGNAL(triggered(bool)), this, SLOT(On_newItem_triggered()));
 
-    fileMenu->addMenu(new SaveMenu());
+    fileMenu->addMenu(new StoreMenu());
 
     QAction* printItem = new QAction(tr("Print Table"),this);
     fileMenu->addAction(printItem);
-#if 0
-    printItem.addActionListener(new ActionListener() {
-        /*public*/ void actionPerformed(ActionEvent e) {
-            try {
-                // MessageFormat headerFormat = new MessageFormat(getTitle());  // not used below
-                MessageFormat footerFormat = new MessageFormat(getTitle() + " page {0,number}");
-                if (item.getStandardTableModel()) {
-                    item.getDataTable().print(JTable.PrintMode.FIT_WIDTH, NULL, footerFormat);
-                } else {
-                    item.getAAClass().print(JTable.PrintMode.FIT_WIDTH, NULL, footerFormat);
-                }
-            } catch (java.awt.print.PrinterException e1) {
-                log->warn("error printing: " + e1, e1);
-            } catch (NullPointerException ex) {
-                log->error("Trying to print returned a NPE error");
-            }
-        }
+#if 1
+//    printItem.addActionListener(new ActionListener() {
+//        /*public*/ void actionPerformed(ActionEvent e) {
+    connect(printItem, &QAction::triggered, [=]{
+     try {
+         // MessageFormat headerFormat = new MessageFormat(getTitle());  // not used below
+      QString footerFormat = QString(getTitle() + " page {0,number}");
+      QString headerFormat = getTitle() + " page {0,number}";
+          if (item->getStandardTableModel()) {
+              item->getDataTable()->print(JTable::PrintMode::FIT_WIDTH, QString(), footerFormat);
+          } else {
+              item->getAAClass()->print(JTable::PrintMode::FIT_WIDTH, QString(), footerFormat);
+          }
+      } catch (PrinterException e1) {
+          log->warn("error printing: " + e1.getLocalizedMessage(), e1);
+      } catch (NullPointerException ex) {
+          log->error("Trying to print returned a NPE error");
+      }
+//     }
     });
 #endif
     QMenu* viewMenu = new QMenu(tr("View"));

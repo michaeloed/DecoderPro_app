@@ -9,6 +9,7 @@
 #include "internallightmanager.h"
 #include "loggerfactory.h"
 #include "internalconsistmanager.h"
+#include "internalmetermanager.h"
 
 //InternalSystemConnectionMemo::InternalSystemConnectionMemo()
 //{
@@ -35,19 +36,19 @@
 // /*public*/ class InternalSystemConnectionMemo extends jmrix.SystemConnectionMemo implements InstanceManagerAutoDefault {
 
 /*public*/ InternalSystemConnectionMemo::InternalSystemConnectionMemo(QString prefix, QString name, bool defaultInstanceType, QObject *parent)
- : SystemConnectionMemo(prefix, name, parent)
+ : DefaultSystemConnectionMemo(prefix, name, parent)
 {
  common(prefix, name, defaultInstanceType);
 }
 
 /*public*/ InternalSystemConnectionMemo::InternalSystemConnectionMemo(QString prefix, QString name,QObject* parent)
- : SystemConnectionMemo(prefix, name, parent)
+ : DefaultSystemConnectionMemo(prefix, name, parent)
 {
  common(prefix, name, true);
 }
 
 /*public*/ InternalSystemConnectionMemo::InternalSystemConnectionMemo(bool defaultInstanceType,QObject* parent)
- : SystemConnectionMemo("I", "Internal", parent)
+ : DefaultSystemConnectionMemo("I", "Internal", parent)
 {
  common("I", "Internal", defaultInstanceType);
 }
@@ -55,7 +56,7 @@
 // invoked by i.e. InstanceManager via the InstanceManagerAutoDefault
 // mechanism, this creates a partial system
 /*public*/ InternalSystemConnectionMemo::InternalSystemConnectionMemo(QObject* parent)
- : SystemConnectionMemo("I", "Internal", parent)
+ : DefaultSystemConnectionMemo("I", "Internal", parent)
 {
     //this(true);
  common("I", "Internal", true);
@@ -64,6 +65,8 @@
 void InternalSystemConnectionMemo::common(QString prefix, QString name, bool defaultInstanceType)
 {
  setObjectName("InternalSystemConnectionMemo");
+ if(log == nullptr)
+  log = LoggerFactory::getLogger("InternalSystemConnectionMemo");
 
  InstanceManager::store(this, "InternalSystemConnectionMemo"); // also register as specific type
  _register();
@@ -138,11 +141,22 @@ void InternalSystemConnectionMemo::common(QString prefix, QString name, bool def
     return turnoutManager;
 }
 
+/*public*/ InternalMeterManager* InternalSystemConnectionMemo::getMeterManager() {
+    //InternalMeterManager* meterManager = (InternalMeterManager*) classObjectMap.value("MeterManager");
+    if (meterManager == nullptr) {
+        log->debug("Create InternalMeterManager by request", getSystemPrefix());
+        meterManager = new InternalMeterManager(this);
+        // special due to ProxyManager support
+        InstanceManager::setMeterManager((MeterManager*)meterManager);
+    }
+    return meterManager;
+}
+
 /*public*/ DebugThrottleManager* InternalSystemConnectionMemo::getThrottleManager() {
     if (throttleManager == nullptr) {
         log->debug("Create DebugThrottleManager by request");
         // Install a debug throttle manager
-        throttleManager = new DebugThrottleManager(this);
+        throttleManager = new DebugThrottleManager(this->self());
         InstanceManager::setThrottleManager(throttleManager);
     }
     return throttleManager;
@@ -161,7 +175,7 @@ void InternalSystemConnectionMemo::common(QString prefix, QString name, bool def
     if (programManager == nullptr) {
         log->debug("Create DebugProgrammerManager by request");
         // Install a debug programmer
-        programManager = new DebugProgrammerManager(this);
+        programManager = new DebugProgrammerManager(this->self());
         // Don't auto-enter, as that messes up selection in Single CV programmer
         //InstanceManager.setProgrammerManager(programManager);
     }

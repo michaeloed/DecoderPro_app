@@ -8,8 +8,19 @@
 #include <QMenu>
 #include <QFrame>
 #include "addresslistener.h"
+#include "jcombobox.h"
+#include "spinnernumbermodel.h"
+#include "gridbagconstraints.h"
+#include "jpanel.h"
+#include "gridbaglayout.h"
+#include "jspinner.h"
+#include "speedstepmode.h"
+#include <QAbstractButton>
 
+class RosterEntry;
+class ThrottlesPreferences;
 class MySlider;
+class JSlider;
 class AddressPanel;
 class LocoAddress;
 class QButtonGroup;
@@ -18,7 +29,6 @@ class NamedIcon;
 class QPushButton;
 class JLabel;
 class PropertyChangeEvent;
-class LearnThrottleFrame;
 class QSlider;
 class QSpinBox;
 class QRadioButton;
@@ -29,21 +39,26 @@ class ControlPanel : public QDockWidget, public AddressListener
  Q_INTERFACES(AddressListener)
 public:
     //explicit ControlPanel(QWidget *parent = 0);
-    /*public*/ ControlPanel(LearnThrottleFrame* ltf, QWidget *parent);
- /*public*/ void setAddressPanel(AddressPanel* addressPanel);
- /*public*/  ~ControlPanel();
+    /*public*/ ControlPanel(QWidget *parent = 0);
+    /*public*/ void setAddressPanel(AddressPanel* addressPanel);
+    /*public*/  ~ControlPanel();
+    /*public*/ void destroy();
     /*public*/ void dispose();
     /*public*/ void setEnabled(bool isEnabled);
-//    /*public*/ void setSpeedSteps(int steps);
-    QT_DEPRECATED /*public*/ void setSpeedController(int displaySlider);
-    /*public*/ void setSpeedValues(int speedIncrement, int speed);
-    /*private*/ void changeOrientation();
+    /*public*/ void setSpeedController(int displaySlider);
+    /*public*/ void setSpeedValues(float speedIncrement, float speed);
     /*public*/ void accelerate1();
     /*public*/ void accelerate10();
     /*public*/ void decelerate1();
     /*public*/ void decelerate10();
- /*public*/ QDomElement getXml();
- /*public*/ void setXml(QDomElement e);
+    /*public*/ QDomElement getXml();
+    /*public*/ void setXml(QDomElement e);
+    /*public*/ QWidget* getContentPane() {return widget();}
+    /*public*/ void setForwardDirection(bool fwd);
+    /*public*/ JSlider* getSpeedSlider();
+    /*public*/ JSlider* getSpeedSliderContinuous();
+    /*public*/ void toFront() { raise();}
+
  enum SPEEDS
  {
   /* Constants for speed selection method */
@@ -60,6 +75,7 @@ public:
  /*public*/ void setTrackSlider(bool track);
  /*public*/ bool getTrackSlider();
  QObject* self() {return (QObject*)this;}
+ /*public*/ void saveToRoster(RosterEntry* re);
 
 signals:
 
@@ -74,39 +90,54 @@ public slots:
  /*public*/ void actionPerformed(/*ActionEvent e*/);
 
 private:
-    /*private*/ LearnThrottleFrame* _throttleFrame;
     /*private*/ QWidget* mainPanel;
-    /*private*/ MySlider* speedSlider;
-    /*private*/ MySlider* speedSliderContinuous;
-    /*private*/ QSpinBox* speedSpinner;
-//    /*private*/ SpinnerNumberModel speedSpinnerModel;
-        /*private*/ QRadioButton* speedStep128Button;
-    /*private*/ QRadioButton* speedStep28Button;
-    /*private*/ QRadioButton* speedStep27Button;
-    /*private*/ QRadioButton* speedStep14Button;
+    /*private*/ JSlider* speedSlider;
+    /*private*/ JSlider* speedSliderContinuous;
+    /*private*/ JSpinner* speedSpinner;
+    /*private*/ SpinnerNumberModel* speedSpinnerModel;
+    /*private*/ JComboBox/*<SpeedStepMode>*/* speedStepBox;
+//    /*private*/ QRadioButton* speedStep128Button;
+//    /*private*/ QRadioButton* speedStep28Button;
+//    /*private*/ QRadioButton* speedStep27Button;
+//    /*private*/ QRadioButton* speedStep14Button;
     /*private*/ QRadioButton *forwardButton, *reverseButton;
     /*private*/ QPushButton* stopButton;
     /*private*/ QPushButton* idleButton;
-
+    SpeedStepMode* speedStepMode;
     /*private*/ QFrame* speedControlPanel;
     /*private*/	QWidget* spinnerPanel;
+    GridBagLayout* spinnerPanelLayout;
     /*private*/	QFrame* sliderPanel;
+    GridBagLayout* sliderPanelLayout;
     /*private*/ QWidget* speedSliderContinuousPanel;
+    GridBagLayout* speedSliderContinuousPanelLayout;
     ButtonFrame* buttonFrame;
     /*private*/ AddressPanel* addressPanel; //for access to roster entry
 
     /*private*/ int _displaySlider;// = SLIDERDISPLAY;
     /*private*/ bool _emergencyStop;// = false;
 
-    /*private*/ DccThrottle* _throttle;
+    /*private*/ DccThrottle* _throttle = nullptr;
+    /*private*/ JPanel* buttonPanel = nullptr;
+    /*private*/ JPanel* topButtonPanel = nullptr;
     /*private*/ bool internalAdjust;// = false;
 
     // LocoNet really only has 126 speed steps i.e. 0..127 - 1 for em stop
     /*private*/ int MAX_SPEED;// = 126;
-    Logger* log;
+    static Logger* log;
     /*private*/ void initGUI();
     /*private*/ void speedSetting(float speed);
-    /*private*/ void configureAvailableSpeedStepModes();
+//    /*private*/ void configureAvailableSpeedStepModes();
+    /*private*/ GridBagConstraints makeDefaultGridBagConstraints();
+    /*private*/ void layoutTopButtonPanel();
+    GridBagLayout* topButtonPanelLayout;
+    /*private*/ void layoutButtonPanel();
+    /*private*/ void layoutSliderPanel();
+    /*private*/ void layoutSpeedSliderContinuous();
+    /*private*/ void layoutSpinnerPanel();
+    /*private*/ void setupButton(QAbstractButton *button, /*final*/ ThrottlesPreferences* preferences, /*final*/ QString iconPath,
+            /*final*/ QString selectedIconPath, /*final*/ QString message);
+    /*private*/ void changeOrientation();
 
     /*private*/ bool trackSlider;// = false;
     /*private*/ bool trackSliderDefault;// = false;
@@ -125,10 +156,10 @@ private:
     // Switch to continuous slider on function...
     /*private*/ QString switchSliderFunction = "Fxx";
     /*private*/ QString prevShuntingFn = "";
-    /*private*/ void setSpeedStepsMode(int speedStepMode);
+    /*private*/ void setSpeedStepsMode(SpeedStepMode::SSMODES speedStepMode);
     QMenu* propertiesPopup;
     /*private*/ void setIsForward(bool isForward);
-    QWidget* buttonPanel;
+    GridBagLayout* buttonPanelLayout = nullptr;
     void resizeEvent(QResizeEvent*);
 
 private slots:
@@ -146,6 +177,7 @@ private slots:
     void on_editProperties();
     void on_menu_requested();
 
+    friend class ControlPanelTest;
 };
 #if 0
 class ButtonFrame : public QWidget

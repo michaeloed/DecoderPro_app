@@ -80,6 +80,9 @@ public:
     QFont getFont();
     void setFont(QFont);
     QObject* jself() {return (QObject*)this;}
+    /*public*/ void setEnabled(bool b) override {QWidget::setEnabled(b);}
+    bool _closed = false;
+    virtual bool closedNormally() {return _closed;}
 
     void setAlwaysOnTop(bool checked);
 #if QT_VERSION >= 0x050000
@@ -92,6 +95,10 @@ public:
     /*public*/ Border* getBorder() {return _border;}
     /*public*/ void removeAll();
 
+    /*public*/ virtual void componentMoved(QMoveEvent* ) {}
+    /*public*/ virtual void componentResized(QResizeEvent* ) {}
+
+    /*public*/void setBounds(QRect r);
 
 
 signals:
@@ -108,8 +115,6 @@ private:
  //void resizeEvent(QResizeEvent *);
  void hideEvent(QHideEvent *);
  //void moveEvent(QMoveEvent*);
- /*public*/ virtual void componentMoved(QMoveEvent* ) {}
- /*public*/ virtual void componentResized(QResizeEvent* ) {}
  Border* _border = nullptr;
  bool _windowClosing = false;
 

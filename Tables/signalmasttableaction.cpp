@@ -56,7 +56,7 @@ SignalMastTableAction::SignalMastTableAction(QObject*parent)
     return "package.jmri.jmrit.beantable.SignalMastTable";
 }
 
-/*public*/ void SignalMastTableAction::actionPerformed(ActionEvent* /*e*/) {
+/*public*/ void SignalMastTableAction::actionPerformed(JActionEvent * /*e*/) {
     // create the JTable model, with changes for specific NamedBean
     createModel();
     MySortFilterProxyModel* sorter = new MySortFilterProxyModel(m);
@@ -91,7 +91,7 @@ void SMTBeanTableFrame::extras() {
     connect(addButton, SIGNAL(clicked()), act, SLOT(addPressed()));
 }
 
-/*protected*/ void SignalMastTableAction::addPressed(ActionEvent* /*e*/) {
+/*protected*/ void SignalMastTableAction::addPressed(JActionEvent* /*e*/) {
     if (addFrame == NULL) {
         addFrame = new AddSignalMastJFrame();
     } else {

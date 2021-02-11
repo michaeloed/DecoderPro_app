@@ -224,6 +224,7 @@ public:
     /*public*/ EntryPointTableModel(SectionTableAction* act);
     /*public*/ int columnCount(const QModelIndex &parent) const;
     /*public*/ int rowCount(const QModelIndex &parent) const;
+    /*public*/ QString getColumnClass(int c);
     /*public*/ Qt::ItemFlags flags(const QModelIndex &index) const;
     /*public*/ QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     /*public*/ int getPreferredWidth(int col);
@@ -238,7 +239,7 @@ class YesButtonActionListener : public ActionListener
 public:
  YesButtonActionListener(JDialog* dlg, Section* s);
 public slots:
- void actionPerformed(ActionEvent *e = 0);
+ void actionPerformed(JActionEvent *e = 0);
 };
 class NoButtonActionListener : public ActionListener
 {
@@ -247,6 +248,6 @@ class NoButtonActionListener : public ActionListener
 public:
  NoButtonActionListener(JDialog* dlg);
 public slots:
- void actionPerformed(ActionEvent *e = 0);
+ void actionPerformed(JActionEvent *e = 0);
 };
 #endif // SECTIONTABLEACTION_H

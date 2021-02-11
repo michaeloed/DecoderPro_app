@@ -35,8 +35,8 @@ public:
     /*public*/ void loadComplete();
     /*public*/ void setDefaultPortalIcons(QMap<QString, NamedIcon *> *map);
     /*public*/ QMap<QString, NamedIcon *> *getPortalIconMap();
-    /*public*/ bool getShapeSelect() ;
-    /*public*/ void setShapeSelect(bool set) ;
+    /*public*/ bool getShapeSelect();
+    /*public*/ void setShapeSelect(bool set);
     /*public*/ ShapeDrawer* getShapeDrawer();
     /*public*/ CircuitBuilder* getCircuitBuilder();
     /*public*/ void mouseEntered(QGraphicsSceneMouseEvent * event);
@@ -121,14 +121,7 @@ private slots:
  void selectAllAction();
  void storeImageIndexAction();
  void deleteAction();
- void closeEditor();
  void sceneChanged(QList<QRectF>);
- void on_disableShapeSelect(bool);
- void on_makeCircuitMenu();
- void on_scrollBoth_triggered();
- void on_scrollNone_triggered();
- void on_scrollHorizontal_triggered();
- void on_scrollVertical_triggered();
 
 protected:
  /*protected*/ QMenuBar* _menuBar;
@@ -148,7 +141,6 @@ protected:
 /*protected*/ Positionable* getCurrentSelection(QGraphicsSceneMouseEvent* event);
 /*protected*/ Positionable* getCopySelection(QGraphicsSceneMouseEvent* event);
 /*protected*/ void makeCircuitMenu();
-/*protected*/ void makeCircuitMenu(bool edit);
 /*protected*/ void disableMenus();
 /*protected*/ QList<Positionable*>* getSelectionGroup();
 /*protected*/ void highlight(Positionable* pos);
@@ -162,6 +154,8 @@ protected:
 /*protected*/ void setSelectionsRotation(int k, Positionable* p);
 /*protected*/ void showPopUp(Positionable* p, QGraphicsSceneMouseEvent* event);
 
+protected slots:
+ /*protected*/ void makeCircuitMenu(bool edit);
 
 friend class CircuitBuilder;
 friend class EditCircuitFrame;
@@ -181,7 +175,7 @@ class CPEditItemActionListener : public ActionListener
     Q_OBJECT
     ControlPanelEditor* panelEd;
 public slots:
-    /*public*/ void actionPerformed(ActionEvent* e = 0);
+    /*public*/ void actionPerformed(JActionEvent* e = 0);
 public:
     CPEditItemActionListener* init(ControlPanelEditor* pe);
 };
@@ -191,7 +185,7 @@ class DuplicateActionListener : public ActionListener
  Positionable* comp;
  ControlPanelEditor* edit;
 public slots:
-    /*public*/ void actionPerformed(ActionEvent* e = 0);
+    /*public*/ void actionPerformed(JActionEvent* e = 0);
 public:
     DuplicateActionListener* init(Positionable* pos, ControlPanelEditor* edit);
 };

@@ -30,7 +30,7 @@ LayoutBlockManagerXml::LayoutBlockManagerXml(QObject*parent) :
 {
  QDomElement layoutblocks = doc.createElement("layoutblocks");
  //setStoreElementClass(layoutblocks);
- layoutblocks.setAttribute("class", "jmri.jmrit.display.layouteditor.configurexml.LayoutBlockManagerXml");
+ layoutblocks.setAttribute("class", "jmri.jmrit.display.layoutEditor.configurexml.LayoutBlockManagerXml");
  LayoutBlockManager* tm = (LayoutBlockManager*) o;
  if (tm->isAdvancedRoutingEnabled())
  {
@@ -93,7 +93,7 @@ LayoutBlockManagerXml::LayoutBlockManagerXml(QObject*parent) :
  */
 /*public*/ void LayoutBlockManagerXml::setStoreElementClass(QDomElement layoutblocks)
 {
- layoutblocks.setAttribute("class",                        "jmri.jmrit.display.configurexml.LayoutBlockManagerXml");
+ layoutblocks.setAttribute("class", "jmri.jmrit.display.layoutEditor.configurexml.LayoutBlockManagerXml");
 }
 
 /*public*/ void LayoutBlockManagerXml::load(QDomElement /*element*/, QObject* /*o*/) throw (Exception) {

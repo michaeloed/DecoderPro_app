@@ -16,7 +16,7 @@
 #include "beantabledatamodel.h"
 
 class PropertyChangeEvent;
-class ActionEvent;
+class JActionEvent;
 class BeanSelectCreatePanel;
 class JTextField;
 class JmriJFrame;
@@ -40,9 +40,9 @@ signals:
     void propertyChange(PropertyChangeEvent *);
 public slots:
     void typeChanged();
-    void okPressed(ActionEvent* e = nullptr);
-    void cancelPressed(ActionEvent*  e = nullptr);
-    void updatePressed(ActionEvent* e = nullptr);
+    void okPressed(JActionEvent* e = nullptr);
+    void cancelPressed(JActionEvent*  e = nullptr);
+    void updatePressed(JActionEvent* e = nullptr);
     //void on_editMenuWindow_aboutToShow();
     //void on_addMenuWindow_aboutToShow();
     static QString getName();

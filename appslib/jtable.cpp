@@ -25,6 +25,7 @@
 #include "tablerowsorter.h"
 #include "qsortfilterproxymodel.h"
 #include <QPen>
+#include "beantabledatamodel.h"
 
 //JTable::JTable(QWidget *parent) :
 //  QTableView(parent)
@@ -727,7 +728,7 @@ static /*public*/ JScrollPane createScrollPaneForTable(JTable aTable) {
  */
 /*public*/ void JTable::setRowHeight(int rowHeight) {
     if (rowHeight <= 0) {
-        throw new IllegalArgumentException("New row height less than 1");
+        throw IllegalArgumentException("New row height less than 1");
     }
     int old = this->_rowHeight;
     this->_rowHeight = rowHeight;
@@ -783,7 +784,7 @@ static /*public*/ JScrollPane createScrollPaneForTable(JTable aTable) {
  */
 /*public*/ void JTable::setRowHeight(int row, int rowHeight) {
     if (rowHeight <= 0) {
-        throw new IllegalArgumentException("New row height less than 1");
+        throw IllegalArgumentException("New row height less than 1");
     }
     getRowModel()->setSize(row, rowHeight);
     if (sortManager != NULL) {
@@ -1107,7 +1108,7 @@ static /*public*/ JScrollPane createScrollPaneForTable(JTable aTable) {
   // Create new columns from the data model info
   log->debug(QString("Table %3 contains %1 rows and %2 columns").arg(m->rowCount()).arg(m->columnCount()).arg(objectName()));
   //for (int i = 0; i < m->columnCount(QModelIndex()); i++)
-  for(int i = 0; i < m->columnCount(QModelIndex()); i++)
+  for(int i = 0; i < m->columnCount(/*QModelIndex()*/); i++)
   {
    TableColumn* newColumn = new TableColumn(i);
    newColumn->setHeaderValue(m->headerData(i,Qt::Horizontal));
@@ -1170,7 +1171,7 @@ static /*public*/ JScrollPane createScrollPaneForTable(JTable aTable) {
         }
     }
 }
-
+#endif
 /**
  * Sets a default cell editor to be used if no editor has been set in
  * a <code>TableColumn</code>. If no editing is required in a table, or a
@@ -1186,15 +1187,31 @@ static /*public*/ JScrollPane createScrollPaneForTable(JTable aTable) {
  * @see     #getDefaultEditor
  * @see     #setDefaultRenderer
  */
-/*public*/ void setDefaultEditor(Class<?> columnClass, TableCellEditor editor) {
-    if (editor != NULL) {
-        defaultEditorsByColumnClass.put(columnClass, editor);
-    }
-    else {
-        defaultEditorsByColumnClass.remove(columnClass);
+/*public*/ void JTable::setDefaultEditor(QString columnClass, QStyledItemDelegate* editor) {
+//    if (editor != NULL) {
+//        defaultEditorsByColumnClass.put(columnClass, editor);
+//    }
+//    else {
+//        defaultEditorsByColumnClass.remove(columnClass);
+//    }
+    defaultItemDelegate = editor;
+    for(int i = 0; i < getColumnCount(); i++)
+    {
+        if(qobject_cast<BeanTableDataModel*>(getModel()))
+        {
+           if(columnClass == ((BeanTableDataModel*) getModel())->getColumnClass(i))
+           {
+               if(((BeanTableDataModel*) getModel())->getColumnClass(i) == "JButton")
+                ((BeanTableDataModel*) getModel())->setColumnToHoldDelegate(this, i, editor);
+               if(((BeanTableDataModel*) getModel())->getColumnClass(i) == "JToggleButton")
+                ((BeanTableDataModel*) getModel())->setColumnToHoldDelegate(this, i, editor);
+               if(((BeanTableDataModel*) getModel())->getColumnClass(i) == "JComboBox")
+                ((BeanTableDataModel*) getModel())->setColumnToHoldDelegate(this, i, editor);
+           }
+        }
     }
 }
-
+#if 0
 /**
  * Returns the editor to be used when no editor has been set in
  * a <code>TableColumn</code>. During the editing of cells the editor is fetched from
@@ -1939,15 +1956,16 @@ Object setDropLocation(TransferHandler.DropLocation location,
         selModel.setValueIsAdjusting(false);
     }
 }
-
+#endif
 /**
  * Deselects all selected columns and rows.
  */
-/*public*/ void clearSelection() {
-    selectionModel.clearSelection();
-    columnModel.getSelectionModel().clearSelection();
+/*public*/ void JTable::clearSelection() {
+    _selectionModel->clearSelection();
+    columnModel->getSelectionModel()->clearSelection();
+    QAbstractItemView::clearSelection();
 }
-#endif
+
 /*private*/ void JTable::clearSelectionAndLeadAnchor() {
     _selectionModel->setValueIsAdjusting(true);
     columnModel->getSelectionModel()->setValueIsAdjusting(true);
@@ -3556,13 +3574,14 @@ private void adjustSizes(long target, Resizable2 r, bool limitToRange) {
    for(int i = columnModel->getColumnCount(); i < dataModel->columnCount(QModelIndex()); i++)
     columnModel->addColumn(new TableColumn(i));
   }
-  connect((DefaultTableColumnModel*)columnModel, SIGNAL(propertyChange(PropertyChangeEvent*)), this, SLOT(onPropertyChange(PropertyChangeEvent*)));
+  connect((DefaultTableColumnModel*)columnModel, SIGNAL(firePropertyChange(PropertyChangeEvent*)), this, SLOT(onPropertyChange(PropertyChangeEvent*)));
  }
 }
- void JTable::On_columnsAboutToBeInserted(QModelIndex, int from, int to)
- {
-  log->debug(QString("Columns about to be inserted %1 %2 ").arg(from).arg(to));
- }
+
+void JTable::On_columnsAboutToBeInserted(QModelIndex, int from, int to)
+{
+log->debug(QString("Columns about to be inserted %1 %2 ").arg(from).arg(to));
+}
 
 /**
  * Returns the <code>TableModel</code> that provides the data displayed by this
@@ -3592,7 +3611,7 @@ private void adjustSizes(long target, Resizable2 r, bool limitToRange) {
 {
  if (columnModel == NULL)
  {
-  throw new IllegalArgumentException("Cannot set a NULL ColumnModel");
+  throw IllegalArgumentException("Cannot set a NULL ColumnModel");
  }
  TableColumnModel* old = this->columnModel;
  if (columnModel != old)
@@ -3602,7 +3621,7 @@ private void adjustSizes(long target, Resizable2 r, bool limitToRange) {
 //   old.removeColumnModelListener(this);
   }
   this->columnModel = columnModel;
-  connect((DefaultTableColumnModel*)columnModel, SIGNAL(propertyChange(PropertyChangeEvent*)), this, SLOT(onPropertyChange(PropertyChangeEvent*)));
+  connect((DefaultTableColumnModel*)columnModel, SIGNAL(firePropertyChange(PropertyChangeEvent*)), this, SLOT(onPropertyChange(PropertyChangeEvent*)));
 //  columnModel.addColumnModelListener(this);
 
 //  // Set the column model of the header as well.
@@ -3626,6 +3645,15 @@ private void adjustSizes(long target, Resizable2 r, bool limitToRange) {
 /*public*/ TableColumnModel* JTable::getColumnModel()
 {
  return columnModel;
+}
+
+/*protected*/ void JTable::columnResized(int column, int oldWidth, int newWidth)
+{
+ if(columnModel)
+ {
+  TableColumn* tc = columnModel->getColumn(column);
+  tc->setWidth(newWidth);
+ }
 }
 
 /**
@@ -5481,7 +5509,7 @@ static class BooleanEditor extends DefaultCellEditor {
  * @see javax.swing.table.DefaultTableColumnModel
  */
 /*protected*/ TableColumnModel* JTable::createDefaultColumnModel() {
- return new DefaultTableColumnModel((AbstractTableModel*)model());
+ return new DefaultTableColumnModel(/*(AbstractTableModel*)model()*/this);
 }
 
 /**
@@ -6132,12 +6160,12 @@ class CellEditorRemover implements PropertyChangeListener {
  {
   if (showPrintDialog)
   {
-   throw new HeadlessException("Can't show print dialog.");
+   throw HeadlessException("Can't show print dialog.");
   }
 
   if (interactive)
   {
-   throw new HeadlessException("Can't run interactively.");
+   throw HeadlessException("Can't run interactively.");
   }
  }
 #if 0
@@ -9723,11 +9751,51 @@ void JTable::firePropertyChange(QString propertyName, QVariant oldValue, QVarian
 }
 
 
+/*public*/ void JTable::setDefaultRenderer(QString, QObject *)
+{
+
+}
 
 
+/*public*/ int JTable::columnAtPoint(QPoint p)
+{
+    return columnAt(p.x());
+}
 
+/*public*/ void JTable::doLayout()
+{
+ for (int i = 0; i < getModel()->columnCount(); i++)
+ {
 
+    TableCellEditor* editor = getColumnModel()->getColumn(i)->getCellEditor();
+    if(editor)
+    {
+     QItemDelegate* delegate = qobject_cast<QItemDelegate*>(editor->self());
+     if(delegate != itemDelegateForColumn(i))
+     {
+       setItemDelegateForColumn(i, delegate);
+     }
+    }
+ }
+}
 
+/*public*/ TableColumn* JTable::getColumn(QString name)
+{
+ for(int i =0; i < getColumnCount(); i++)
+ {
+  if(getColumnName(i) == name)
+  {
+   return getColumnModel()->getColumn(i);
+  }
+ }
+ return nullptr;
+}
 
+/*public*/ QAbstractItemDelegate* JTable::getCellRenderer(int row, int column){
+    return itemDelegate(model()->index(row, column));
+}
 
+/*public*/ QAbstractItemDelegate *JTable::getCellEditor(int row, int column){
+    return itemDelegate(model()->index(row, column));
+}
 

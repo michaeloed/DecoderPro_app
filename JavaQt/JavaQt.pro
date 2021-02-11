@@ -251,7 +251,14 @@ SOURCES += javaqt.cpp \
     jcheckbox.cpp \
     etchedborder.cpp \
     jcheckboxmenuitem.cpp \
-    keyadapter.cpp
+    keyadapter.cpp \
+    loggingutil.cpp \
+    localdatetime.cpp \
+    jformattedtextfield.cpp \
+    threadingutil.cpp \
+    transferactionlistener.cpp \
+    togglebutton.cpp \
+    defaultcomboboxmodel.cpp
 
 HEADERS += javaqt.h\
         javaqt_global.h \
@@ -557,7 +564,19 @@ HEADERS += javaqt.h\
     supplier.h \
     jcheckboxmenuitem.h \
     keyadapter.h \
-    keylistener.h
+    keylistener.h \
+    loggingutil.h \
+    localdatetime.h \
+    jformattedtextfield.h \
+    threadingutil.h \
+    transferactionlistener.h \
+    tablecellrenderer.h \
+    tablecelleditor.h \
+    tabledelegates.h \
+    togglebutton.h \
+    defaultcomboboxmodel.h \
+    runnable.h \
+    comboboxmodel.h
 
 unix {
     target.path = /usr/lib

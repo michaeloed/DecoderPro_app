@@ -13,12 +13,13 @@
 #include "loggerfactory.h"
 #include "namedbeancomparator.h"
 #include "vetoablechangesupport.h"
+#include "defaultsystemconnectionmemo.h"
 
 // NOTE: This class is a replacement for AbstractProxyManager that
 // implements SensorManager instead of AbstractManager
 
 AbstractProxyIdTagManager::AbstractProxyIdTagManager(QObject *parent)
-    : IdTagManager(new SystemConnectionMemo(), parent)
+    : IdTagManager(new DefaultSystemConnectionMemo(), parent)
 {
  mgrs = QList<Manager*>();
  internalManager = nullptr;
@@ -81,7 +82,7 @@ AbstractProxyIdTagManager::AbstractProxyIdTagManager(QObject *parent)
  * Returns a list of all managers, including the
  * internal manager.  This is not a live list.
  */
-/*public*/ QList<Manager*> AbstractProxyIdTagManager::getManagerList()
+/*public*/ QList<Manager*> AbstractProxyIdTagManager::getManagerList() const
 {
  // make sure internal present
  initInternal();
@@ -95,7 +96,7 @@ AbstractProxyIdTagManager::AbstractProxyIdTagManager(QObject *parent)
  *
  * @return the list of managers
  */
-/*public*/ QList<Manager*> AbstractProxyIdTagManager::getDisplayOrderManagerList() {
+/*public*/ QList<Manager*> AbstractProxyIdTagManager::getDisplayOrderManagerList() const {
     // make sure internal present
     initInternal();
 

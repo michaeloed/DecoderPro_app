@@ -13,7 +13,7 @@ class LIBPR3SHARED_EXPORT AbstractSimulatorConnectionConfig : public AbstractCon
 public:
     explicit AbstractSimulatorConnectionConfig(QObject *parent = 0);
     /*public*/ AbstractSimulatorConnectionConfig(SerialPortAdapter* p,QObject *parent = 0);
-    /*public*/ PortAdapter* getAdapter();
+    /*public*/ PortAdapter* getAdapter() override;
     /*public*/ void updateAdapter();
     /*public*/ QString getInfo();
     /*public*/ void loadDetails(/*final*/ JPanel *details);
@@ -53,7 +53,7 @@ class ASCCActionListener : public ActionListener
 public:
  ASCCActionListener(QString item, AbstractSimulatorConnectionConfig* parent);
 public slots:
- void actionPerformed(ActionEvent *e = 0);
+ void actionPerformed(JActionEvent *e = 0);
 };
 
 #endif // ABSTRACTSIMULATORCONNECTIONCONFIG_H

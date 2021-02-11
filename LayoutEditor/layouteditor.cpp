@@ -1157,6 +1157,7 @@ void LayoutEditor::on_scenePos(QGraphicsSceneMouseEvent* event)
  */
 //@Nonnull
 /*public*/ /*static*/ QPointF LayoutEditor::getCoords(/*@Nonnull*/ LayoutTrack* layoutTrack, int connectionType) {
+    if (layoutTrack == nullptr) throw NullPointerException("layoutTrack is marked @NonNull but is null");
     return layoutTrack->getCoordsForConnectionType(connectionType);
 }
 
@@ -5120,8 +5121,8 @@ LEMemoryIcon *LayoutEditor::checkMemoryMarkerIcons(QPointF loc)
  }
 
  SignalHead* LayoutEditor::getSignalHead(QString name) {
-     SignalHead* sh = (SignalHead*)static_cast<SignalHeadManager*>(InstanceManager::getDefault("SignalHeadManager"))->getBySystemName(name);
-     if (sh == nullptr) sh = (SignalHead*)static_cast<SignalHeadManager*>(InstanceManager::getDefault("SignalHeadManager"))->getByUserName(name);
+     SignalHead* sh = (SignalHead*)static_cast<AbstractSignalHeadManager*>(InstanceManager::getDefault("SignalHeadManager"))->getBySystemName(name);
+     if (sh == nullptr) sh = (SignalHead*)static_cast<AbstractSignalHeadManager*>(InstanceManager::getDefault("SignalHeadManager"))->getByUserName(name);
      if (sh == nullptr) log->warn("did not find a SignalHead named "+name);
      return sh;
  }
@@ -5400,7 +5401,7 @@ void LayoutEditor::addLabel()
     if (qobject_cast<SignalMast*>(sm)) {
         sb.append("Signal Mast");
         sb.append(" is linked to the following items<br> do you want to remove those references");
-        if (InstanceManager::signalMastLogicManagerInstance()->isSignalMastUsed((SignalMast*) sm)) {
+        if (((SignalMastLogicManager*)InstanceManager::getDefault("SignalMastLogicManager"))->isSignalMastUsed((SignalMast*) sm)) {
             SignalMastLogic* sml = qobject_cast<SignalMastLogicManager*>(InstanceManager::getDefault("SignalMastLogicManager"))->getSignalMastLogic((SignalMast*) sm);
             //jmri.SignalMastLogic sml = InstanceManager.signalMastLogicManagerInstance().getSignalMastLogic((SignalMast)sm);
             if (sml != nullptr && sml->useLayoutEditor(sml->getDestinationList().at(0))) {
@@ -6967,24 +6968,24 @@ void LayoutEditor::undoMoveSelection() {
                 }
                 positionableLabel->rotate(positionableLabel->getDegrees() + 90);
             } catch (NullPointerException ex) {
-            }
+            log->warn("previously-ignored NPE", ex);}
         }
         if (reLocateFlag) {
             try {
                 positionable->setLocation((int) (newTopLeft.x() - cBounds.height()), (int) newTopLeft.y());
             } catch (NullPointerException ex) {
-
+             log->warn("previously-ignored NPE", ex);
             }
         }
     }
 
-    for (LayoutTrack* lt : *layoutTrackList) {
+    for (LayoutTrack* ltv : *layoutTrackList) {
         try {
-            QPointF newPoint = MathUtil::subtract(MathUtil::rotateDEG(lt->getCoordsCenter(), lowerLeft, 90), lowerLeft);
-            lt->setCoordsCenter(newPoint);
-            lt->rotateCoords(90);
+            QPointF newPoint = MathUtil::subtract(MathUtil::rotateDEG(ltv->getCoordsCenter(), lowerLeft, 90), lowerLeft);
+            ltv->setCoordsCenter(newPoint);
+            ltv->rotateCoords(90);
         } catch (NullPointerException ex) {
-
+         log->warn("previously-ignored NPE", ex);
         }
     }
 

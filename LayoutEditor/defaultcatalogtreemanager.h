@@ -19,7 +19,7 @@ public:
     /*public*/ QString getSystemPrefix() const override;
     /*public*/ char typeLetter()const override ;
     /*public*/ CatalogTree* getCatalogTree(QString name) override;
-    /*public*/ NamedBean *getBySystemName(QString key) const override;
+    /*public*/ NamedBean* getBySystemName(QString key) const override;
     /*public*/ NamedBean* getByUserName(QString key) const override;
     /*public*/ CatalogTree* newCatalogTree(QString sysName, QString userName)override;
     /*public*/ static DefaultCatalogTreeManager* instance();
@@ -31,7 +31,7 @@ public:
     /*public*/ QString getNamedBeanClass()const override {
         return "CatalogTree";
     }
-
+    SystemConnectionMemo* getMemo() const {return nullptr;}
 signals:
 
 public slots:

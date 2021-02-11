@@ -9,7 +9,7 @@
 #include "turnoutmanager.h"
 #include "proxymanager.h"
 
-// NOTE: This class is a replacement for AbstractProxyManager that
+// NOTE: This class is a replacement for AbstractProxyManager<E> that
 // implements TurnoutManager instead of AbstractManager
 
 class LIBPR3SHARED_EXPORT AbstractProxyTurnoutManager :  public TurnoutManager, public ProxyManager
@@ -22,8 +22,8 @@ public:
      * Returns a list of all managers, including the
      * internal manager.  This is not a live list.
      */
-    /*public*/ QList<Manager*> getManagerList() override;
-    /*public*/ QList<Manager*> getDisplayOrderManagerList() override;
+    /*public*/ QList<Manager*> getManagerList() const override;
+    /*public*/ QList<Manager*> getDisplayOrderManagerList() const override;
     /*public*/ Manager* getInternalManager() const;
     /*public*/ Manager* getDefaultManager()const override;
     /*public*/ void addManager(Manager* m) override;
@@ -111,8 +111,8 @@ public:
     /*public*/ QVector<PropertyChangeListener*> getPropertyChangeListeners();
     /*public*/ QVector<PropertyChangeListener*> getPropertyChangeListeners(QString propertyName) override;
     /*public*/ void removePropertyChangeListener(QString propertyName, PropertyChangeListener* listener) override;
-    /*public*/ NamedBean* getBySystemName(/*@Nonnull*/ QString systemName) const override;
-    /*public*/ NamedBean* getByUserName(/*@Nonnull*/ QString userName) const override;
+    /*public*/ Turnout* getBySystemName(/*@Nonnull*/ QString systemName) const ;
+    /*public*/ Turnout* getByUserName(/*@Nonnull*/ QString userName) const ;
     /*public*/ QString getNextValidAddress(/*@Nonnull*/ QString curAddress, /*@Nonnull*/ QString prefix, char typeLetter) throw (JmriException);
     /*public*/ void deleteBean(/*@Nonnull*/ NamedBean* s, /*@Nonnull*/ QString property) throw (PropertyVetoException) override;
 

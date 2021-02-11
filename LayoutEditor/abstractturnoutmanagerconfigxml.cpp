@@ -49,7 +49,7 @@ AbstractTurnoutManagerConfigXML::~AbstractTurnoutManagerConfigXML()
  if (tm!=nullptr)
  {
   TurnoutOperationManagerXml* tomx = new TurnoutOperationManagerXml();
-  QDomElement opElem = tomx->store(doc, TurnoutOperationManager::getInstance());
+  QDomElement opElem = tomx->store((TurnoutOperationManager*)InstanceManager::getDefault("TurnoutOperationManager"));
   turnouts.appendChild(opElem);
   QStringListIterator iter(((AbstractTurnoutManager*)tm)->getSystemNameList());
 
@@ -213,7 +213,7 @@ AbstractTurnoutManagerConfigXML::~AbstractTurnoutManagerConfigXML()
  if (operationList.size()>0)
  {
   TurnoutOperationManagerXml* tomx = new TurnoutOperationManagerXml();
-  tomx->load(operationList.at(0).toElement());
+  tomx->load(operationList.at(0).toElement(), QDomElement());
  }
  QDomNodeList turnoutList = turnouts.elementsByTagName("turnout");
  if (log->isDebugEnabled()) log->debug("Found "+QString::number(turnoutList.size())+" turnouts");

@@ -197,7 +197,7 @@ void AddEntryExitPairPanel::on_selectPanel_currentIndexChanged(QString)
  centralWidgetLayout->addLayout(panel1Layout);
  entryExitFrame->adjustSize();
  entryExitFrame->setVisible(true);
-    int retval = JOptionPane::showOptionDialog(NULL, tr("Do you want to automatically generate \nthe Entry Exit Pairs and Logic, based /nupon the track plan in the layout editor?"), tr("AutoGenEntryExitTitle"),
+    int retval = JOptionPane::showOptionDialog(NULL, tr("Do you want to automatically generate \nthe Entry Exit Pairs and Logic, based /nupon the track plan in the layout editor?"), tr("Auto Generate Entry Exit Pairs"),
             JOptionPane::YES_NO_OPTION,
             JOptionPane::QUESTION_MESSAGE/*, QIcon(), NULL, NULL*/);
     if (retval == 0) {
@@ -559,24 +559,24 @@ QString AEPTableModel::isPairActive(int row) const
  return QVariant();
 }
 
-///*public*/ Class<?> getColumnClass(int col) {
-//    switch (col) {
-//        case FROMPOINTCOL:
-//        case TOPOINTCOL:
-//        case ACTIVECOL:
-//            return String.class;
-//        case DELETECOL:
-//        case CLEARCOL:
-//            return JButton.class;
-//        case BOTHWAYCOL:
-//        case ENABLEDCOL:
-//            return Boolean.class;
-//        case TYPECOL:
-//            return String.class;
-//        default:
-//            return NULL;
-//    }
-//}
+/*public*/ QString AEPTableModel::getColumnClass(int col) {
+    switch (col) {
+        case FROMPOINTCOL:
+        case TOPOINTCOL:
+        case ACTIVECOL:
+            return "String";
+        case DELETECOL:
+        case CLEARCOL:
+            return "JButton";
+        case BOTHWAYCOL:
+        case ENABLEDCOL:
+            return "Boolean";
+        case TYPECOL:
+            return "String";
+        default:
+            return "";
+    }
+}
 
 /*public*/ Qt::ItemFlags AEPTableModel::flags(const QModelIndex &index) const
 {
@@ -730,7 +730,7 @@ QString AEPTableModel::isPairActive(int row) const
  * Utility methods for converting between string and color Note: These names
  * are only used internally, so don't need a resource bundle
  */
-/*protected*/ void AddEntryExitPairPanel::optionWindow(ActionEvent* /*e*/)
+/*protected*/ void AddEntryExitPairPanel::optionWindow(JActionEvent* /*e*/)
 {
  if (optionsFrame == NULL)
  {

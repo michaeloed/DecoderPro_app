@@ -65,6 +65,7 @@
 #include "addressedprogrammermanager.h"
 #include "abstractpowermanager.h"
 #include "programmerconfigmanager.h"
+#include "throttlewindow.h"
 
 QList<RosterFrame*> RosterFrame::frameInstances =  QList<RosterFrame*>();
 
@@ -139,7 +140,7 @@ void RosterFrame::common()
  programmer2 = tr("Basic");
  pcs = new PropertyChangeSupport(this);
  inStartProgrammer = false;
- rosterEntry = NULL;
+ re = NULL;
  bUpdating =false;
  _hideBottomPane = false;
  _hideGroups = false;
@@ -236,19 +237,19 @@ void RosterFrame::common()
  ui->statusBar->addWidget(operationsModeProgrammerLabel);
  ui->toolBar->addWidget(modePanel);
  ui->toolBar->addSeparator();
- ui->toolBar->addWidget(new QLabel(tr("Programmer")));
- ui->toolBar->addWidget(cbProgrammers=new QComboBox());
- cbProgrammers->addItem("Advanced");
- cbProgrammers->addItem("Basic");
- cbProgrammers->addItem("Comprehensive");
- cbProgrammers->addItem("Custom");
- cbProgrammers->addItem("ESU");
- cbProgrammers->addItem("Registers");
- cbProgrammers->addItem("Sample Club");
- cbProgrammers->addItem("TrainShowBasic");
- cbProgrammers->addItem("Tutorial");
- cbProgrammers->addItem("Zimo");
- connect(cbProgrammers, SIGNAL(currentIndexChanged(QString)), this, SLOT(On_cbProgrammers_currentIndexChanged(QString)));
+// ui->toolBar->addWidget(new QLabel(tr("Programmer")));
+// ui->toolBar->addWidget(cbProgrammers=new QComboBox());
+// cbProgrammers->addItem("Advanced");
+// cbProgrammers->addItem("Basic");
+// cbProgrammers->addItem("Comprehensive");
+// cbProgrammers->addItem("Custom");
+// cbProgrammers->addItem("ESU");
+// cbProgrammers->addItem("Registers");
+// cbProgrammers->addItem("Sample Club");
+// cbProgrammers->addItem("TrainShowBasic");
+// cbProgrammers->addItem("Tutorial");
+// cbProgrammers->addItem("Zimo");
+// connect(cbProgrammers, SIGNAL(currentIndexChanged(QString)), this, SLOT(On_cbProgrammers_currentIndexChanged(QString)));
  roster = Roster::getDefault();
  //roster->addPropertyChangeListener((PropertyChangeListener*)this);
  connect(roster->pcs, SIGNAL(propertyChange(PropertyChangeEvent*)), this, SLOT(propertyChange(PropertyChangeEvent*)));
@@ -282,7 +283,11 @@ void RosterFrame::common()
 #if 1
 // PanelMenu::instance()->addEditorPanel((Editor*)this);
 // connect(ui->menuWindow, SIGNAL(aboutToShow()), this, SLOT(on_menuWindow_aboutToShow()));
- connect(ui->actionProgram, SIGNAL(triggered()), this, SLOT(on_prog1Button_clicked()));
+ //connect(ui->actionProgram, SIGNAL(triggered()), this, SLOT(on_prog1Button_clicked()));
+ connect(ui->actionProgram, &QAction::triggered, [=]{
+  log->debug("Open programmer pressed");
+              startProgrammer(nullptr, re, programmer1);
+ });
  QTimer::singleShot(10, this, SLOT(buildWindow()));
 #endif
 // ConnectionStatus::instance().addPropertyChangeListener(new PropertyChangeListener()
@@ -393,27 +398,27 @@ void RosterFrame::on_tableWidget_cellClicked(int row, int /*col*/)
 #endif
 void RosterFrame::updateDetails()
 {
- if(rosterEntry == nullptr)
+ if(re == nullptr)
   return;
- ui->lblID->setText(rosterEntry->getId());
- ui->lblRoadName->setText(rosterEntry->getRoadName());
- ui->lblRoadNumber->setText(rosterEntry->getRoadNumber());
- ui->lblManufacturer->setText(rosterEntry->getMfg());
- ui->lblOwner->setText(rosterEntry->getOwner());
- ui->lblModel->setText(rosterEntry->getModel());
- ui->lblDCCAddress->setText(rosterEntry->getDccAddress());
- ui->lblDecoderFamily->setText(rosterEntry->getDecoderFamily());
- ui->lblDecoderModel->setText(rosterEntry->getDecoderModel());
- ui->lblFileName->setText(rosterEntry->getFileName());
+ ui->lblID->setText(re->getId());
+ ui->lblRoadName->setText(re->getRoadName());
+ ui->lblRoadNumber->setText(re->getRoadNumber());
+ ui->lblManufacturer->setText(re->getMfg());
+ ui->lblOwner->setText(re->getOwner());
+ ui->lblModel->setText(re->getModel());
+ ui->lblDCCAddress->setText(re->getDccAddress());
+ ui->lblDecoderFamily->setText(re->getDecoderFamily());
+ ui->lblDecoderModel->setText(re->getDecoderModel());
+ ui->lblFileName->setText(re->getFileName());
 
  ui->btnRosterMedia->setEnabled(true);
  ui->prog1Button->setEnabled(true);
  ui->throttleLaunch->setEnabled(true);
 
 
- if(QFileInfo(rosterEntry->getImagePath()).exists())
+ if(QFileInfo(re->getImagePath()).exists())
  {
-  QImage img(rosterEntry->getImagePath());
+  QImage img(re->getImagePath());
   ui->locoImage->setPixmap(QPixmap::fromImage(img).scaledToWidth(ui->locoImage->width()));
  }
  else
@@ -424,7 +429,7 @@ void RosterFrame::on_btnRosterMedia_clicked()
 {
  log->debug("Open programmer pressed");
  ui->edit->setChecked(true);
- startProgrammer(nullptr, rosterEntry, "dp3" + File::separator + "MediaPane");
+ startProgrammer(nullptr, re, "dp3" + File::separator + "MediaPane");
 }
 
 void RosterFrame::on_throttleLaunch_clicked()
@@ -439,7 +444,7 @@ void RosterFrame::on_throttleLaunch_clicked()
   {
    ThrottleWindow* tw = (ThrottleWindow*)panel;
    QString id = tw->id();
-   if(id == rosterEntry->getId())
+   if(id == re->getId())
    {
     // Throttle is already created.
     tw->show();
@@ -450,7 +455,7 @@ void RosterFrame::on_throttleLaunch_clicked()
  // Throttle window not found; create a new one.
  ThrottleWindow* tw = new ThrottleWindow(/*memo,*/this);
  log->debug("throttleLaunch clicked");
- tw->getAddressPanel()->setRosterEntry(rosterEntry);
+ tw->getAddressPanel()->setRosterEntry(re);
  tw->show();
 }
 //void RosterFrame::on_menuWindow_aboutToShow()
@@ -460,56 +465,21 @@ void RosterFrame::on_throttleLaunch_clicked()
 //}
 void RosterFrame::on_prog1Button_clicked()
 {
- if (inStartProgrammer)
- {
-  log->debug("Call to start programmer has been called twice when the first call hasn't opened");
-  return;
- }
- setCursor(Qt::WaitCursor);
- inStartProgrammer = true;
- progFrame = NULL;
-  //DecoderFile* pDecoderFile = DecoderIndexFile::instance()->fileFromTitle(/*selectedDecoderType()*/rosterEntry->getDecoderModel()+" ("+rosterEntry->getDecoderFamily()+")"); //TCS V51
- QDir dir;
- dir.setCurrent(FileUtil::getProgramPath()+QDir::separator()+"xml"+QDir::separator());
- DecoderFile* pDecoderFile = DecoderIndexFile::instance()->matchingDecoderList("",rosterEntry->getDecoderFamily(), "", "", "",rosterEntry->getDecoderModel())->at(0);
- QString frameTitle = rosterEntry->getId();
- QString filename = cbProgrammers->currentText();
- QString pProgrammerFile = tr("programmers") + QDir::separator() + filename + ".xml";
-// ProgrammerManager* mgr = (ProgrammerManager*)InstanceManager::getDefault("ProgrammerManager");
-// Programmer* programmer = ((DefaultProgrammerManager*)mgr)->getGlobalProgrammer();
-// Q_UNUSED(programmer);
 
- if(ui->edit->isChecked())
- {
-  progFrame = new PaneProgFrame(pDecoderFile, rosterEntry, frameTitle, pProgrammerFile, NULL, false, this);
- }
- else if(ui->service ->isChecked())
- {
-  progFrame = new PaneServiceProgFrame(pDecoderFile, rosterEntry, frameTitle, pProgrammerFile, modePanel->getProgrammer(), this);
- }
- else if(ui->ops->isChecked())
- {
-  int address = rosterEntry->getDccAddress().toInt();
-  bool longAddr = rosterEntry->isLongAddress();
-  Programmer* pProg = (Programmer*)((DefaultProgrammerManager*)InstanceManager::getDefault("AddressedProgrammerManager"))->getAddressedProgrammer(longAddr, address);
-  progFrame = new PaneOpsProgFrame(pDecoderFile,rosterEntry, frameTitle, pProgrammerFile, pProg, this);
- }
- if(progFrame == NULL) return;
+ log->debug("Open programmer pressed");
+ startProgrammer(nullptr, re, programmer1);
+}
 
- setCursor(Qt::ArrowCursor);
- progFrame->show();
- inStartProgrammer = false;
-}
-void RosterFrame::On_cbProgrammers_currentIndexChanged(QString /*text*/)
-{
- if(progFrame != NULL)
- {
-  progFrame->close();
-  delete progFrame;
-  progFrame = NULL;
-  on_prog1Button_clicked();
- }
-}
+//void RosterFrame::On_cbProgrammers_currentIndexChanged(QString /*text*/)
+//{
+// if(progFrame != NULL)
+// {
+//  progFrame->close();
+//  delete progFrame;
+//  progFrame = NULL;
+//  on_prog1Button_clicked();
+// }
+//}
 
 QString RosterFrame::getTitle()
 {
@@ -719,15 +689,17 @@ void RosterFrame::on_actionNew_Throttle_triggered()
 //    });
  connect(InstanceManager::getDefault(), SIGNAL(propertyChange(PropertyChangeEvent*)), this, SLOT(On_InstanceManagerPropertyChange(PropertyChangeEvent*)));
 // getSplitPane().addPropertyChangeListener(propertyChangeListener);
-// if (ProgDefault::getDefaultProgFile() != NULL)
-// {
-//  programmer1 = ProgDefault::getDefaultProgFile();
-// }
- this->getProgrammerConfigManager()->addPropertyChangeListener(new DefaultFilePropertyChangeListener(this));
+ if (this->getProgrammerConfigManager()->getDefaultFile() != "") {
+     programmer1 = this->getProgrammerConfigManager()->getDefaultFile();
+ }
+ //this->getProgrammerConfigManager()->addPropertyChangeListener(ProgrammerConfigManager::DEFAULT_FILE, (PropertyChangeEvent evt) -> {
+ connect(this->getProgrammerConfigManager()->propertyChangeSupport, &PropertyChangeSupport::propertyChange, [=]{
+     if (this->getProgrammerConfigManager()->getDefaultFile() != "") {
+         programmer1 = this->getProgrammerConfigManager()->getDefaultFile();
+     }
+ });
 
- //QString lastProg = (QString) prefsMgr->getProperty(getWindowFrameRef(), "selectedProgrammer");
- QString lastProg =  cbProgrammers->currentText();
-
+ QString lastProg = (QString) prefsMgr->getProperty(getWindowFrameRef(), "selectedProgrammer").toString();
  if (lastProg != "")
  {
   if (lastProg==("service") && ui->service->isEnabled())
@@ -962,6 +934,7 @@ void RosterFrame::updateProgMode() // SLOT
 //taken out of CombinedLocoSelPane
 /*protected*/ void RosterFrame::startIdentifyLoco()
 {
+ /*final*/ RosterFrame* me = this;
  Programmer* programmer = NULL;
  if (modePanel->isSelected())
  {
@@ -1011,7 +984,7 @@ void RosterFrame::updateProgMode() // SLOT
         }
     };
 #endif
-    MyIdentifyLoco* ident = new MyIdentifyLoco(programmer, this);
+    MyIdentifyLoco* ident = new MyIdentifyLoco(programmer, me);
     connect(ident, SIGNAL(doneSignal(int,bool,int,int)), this, SLOT(selectLoco(int,bool,int,int)));
     ident->start();
 }
@@ -1028,10 +1001,10 @@ void RosterFrame::updateProgMode() // SLOT
     // locate that loco
  inStartProgrammer = false;
 
- if (rosterEntry != NULL)
+ if (re != NULL)
  {
   //We remove the propertychangelistener if we had a previously selected entry;
-//  rosterEntry->removePropertyChangeListener(rosterEntryUpdateListener);
+  re->removePropertyChangeListener(rosterEntryUpdateListener);
  }
  QList<RosterEntry*> l = Roster::getDefault()->matchingList(NULL, NULL, QString::number(dccAddress), NULL, NULL, NULL, NULL);
  if (log->isDebugEnabled())
@@ -1053,7 +1026,7 @@ void RosterFrame::updateProgMode() // SLOT
    }
    if (l2.size() == 1)
    {
-    rosterEntry = l2.at(0);
+    re = l2.at(0);
    }
    else
    {
@@ -1063,9 +1036,9 @@ void RosterFrame::updateProgMode() // SLOT
     }
     //Still more than one possible loco, so check against the decoder family
     QList<RosterEntry*> l3 =  QList<RosterEntry*>();
-    QList<DecoderFile*>* temp = DecoderIndexFile::instance()->matchingDecoderList("", "", QString::number(mfgId), QString::number( modelId), "", "");
+    QList<DecoderFile*> temp = ((DecoderIndexFile*)InstanceManager::getDefault("DecoderIndexFile"))->matchingDecoderList("", "", QString::number(mfgId), QString::number( modelId), "", "");
     QStringList* decoderFam = new QStringList();
-    foreach (DecoderFile* f, *temp)
+    foreach (DecoderFile* f, temp)
     {
      if (!decoderFam->contains(f->getModel()))
      {
@@ -1082,25 +1055,25 @@ void RosterFrame::updateProgMode() // SLOT
     if (l3.isEmpty())
     {
      //Unable to determine the loco against the manufacture therefore will be unable to further identify against decoder.
-     rosterEntry = l2.at(0);
+     re = l2.at(0);
     }
     else
     {
      //We have no other options to match against so will return the first one we come across;
-     rosterEntry = l3.at(0);
+     re = l3.at(0);
     }
    }
   }
   else
   {
-   rosterEntry = l.at(0);
+   re = l.at(0);
   }
-//  rosterEntry->addPropertyChangeListener(rosterEntryUpdateListener);
+  re->addPropertyChangeListener(rosterEntryUpdateListener);
 //  connect(rosterEntry, SIGNAL(propertyChange(PropertyChangeEvent*)), rosterEntryUpdateListener,SLOT(propertyChange(PropertyChangeEvent*)));
 //  connect(rosterEntry->pcs, SIGNAL(propertyChange(PropertyChangeEvent*)), rosterEntryUpdateListener, SLOT(propertyChange(PropertyChangeEvent*)));
   updateDetails();
   //rtable.moveTableViewToSelected();
-  int row = Roster::getDefault()->getGroupIndex(model->getRosterGroup(), rosterEntry);
+  int row = Roster::getDefault()->getGroupIndex(model->getRosterGroup(), re);
   QModelIndex index = model->index(row, 0, QModelIndex());
   QModelIndex ixSort = sorter->mapFromSource(index);
   ui->rtable->selectRow(ixSort.row());
@@ -1396,7 +1369,7 @@ void RosterFrame::on_tableClicked(QModelIndex index)
 {
  QModelIndex ix = sorter->mapToSource(index);
  int row = ix.row();
- rosterEntry = Roster::getDefault()->getGroupEntry(model->getRosterGroup(), row);
+ re = Roster::getDefault()->getGroupEntry(model->getRosterGroup(), row);
  updateDetails();
 }
 
@@ -1437,7 +1410,7 @@ void RosterFrame::On_newLoco_clicked()
     // in the class heirarchy.
     return JmriJFrame::getProperty(key);
 }
-#if 0
+#if 1
 RosterEntryUpdateListener::RosterEntryUpdateListener(RosterFrame* f)
 {
  this->f = f;
@@ -1446,39 +1419,39 @@ RosterEntryUpdateListener::RosterEntryUpdateListener(RosterFrame* f)
 
 void RosterEntryUpdateListener::propertyChange(PropertyChangeEvent * e)
 {
- if(e->getPropertyName() == "add")
- {
-  int row = f->ui->rtable->rowCount();
-  f->ui->rtable->setRowCount(row++);
-  RosterEntry* re = VPtr<RosterEntry>::asPtr(e->getNewValue());
-  f->rows.append(re);
-  f->updateRow(row, re);
- }
- else if(e->getPropertyName() == "remove")
- {
-  RosterEntry* re = VPtr<RosterEntry>::asPtr(e->getNewValue());
-  for(int i = 0; i < f->rows.count(); i++)
-  {
-   if(f->rows.at(i) == re)
-   {
-    f->ui->rtable->removeRow(i);
-    f->rows.remove(i);
-    break;
-   }
-  }
- }
- else if(e->getPropertyName() == "change")
- {
-  RosterEntry* re = VPtr<RosterEntry>::asPtr(e->getNewValue());
-  for(int i = 0; i < f->rows.count(); i++)
-  {
-   if(f->rows.at(i) == re)
-   {
-    f->updateRow(i, re);
-   }
-  }
- }
- //f->updateDetails();
+// if(e->getPropertyName() == "add")
+// {
+//  int row = f->ui->rtable->model()-> rowCount();
+//  //f->ui->rtable->setRowCount(row++);
+//  RosterEntry* re = VPtr<RosterEntry>::asPtr(e->getNewValue());
+//  f->rows.append(re);
+//  f->updateRow(row, re);
+// }
+// else if(e->getPropertyName() == "remove")
+// {
+//  RosterEntry* re = VPtr<RosterEntry>::asPtr(e->getNewValue());
+//  for(int i = 0; i < f->rows.count(); i++)
+//  {
+//   if(f->rows.at(i) == re)
+//   {
+//    f->ui->rtable->removeRow(i);
+//    f->rows.remove(i);
+//    break;
+//   }
+//  }
+// }
+// else if(e->getPropertyName() == "change")
+// {
+//  RosterEntry* re = VPtr<RosterEntry>::asPtr(e->getNewValue());
+//  for(int i = 0; i < f->rows.count(); i++)
+//  {
+//   if(f->rows.at(i) == re)
+//   {
+//    f->updateRow(i, re);
+//   }
+//  }
+// }
+ f->updateDetails();
 }
 #endif
 /*protected*/ void  RosterFrame::buildGUI(QString menubarFile, QString toolbarFile)
@@ -1828,18 +1801,18 @@ void RosterFrame::On_Quit()
 }
 /*protected*/ void RosterFrame::exportLoco()
 {
- ExportRosterItem* act = new ExportRosterItem(tr("Export"), this, rosterEntry);
+ ExportRosterItem* act = new ExportRosterItem(tr("Export"), this, re);
  act->actionPerformed(NULL);
 }
 /*protected*/ void RosterFrame::copyLoco()
 {
-    CopyRosterItem* act = new CopyRosterItem("Copy", this, rosterEntry);
+    CopyRosterItem* act = new CopyRosterItem("Copy", this, re);
     act->actionPerformed(NULL);
 }
 
 /*protected*/ void RosterFrame::printLoco(bool boo)
 {
- PrintRosterEntry* pre = new PrintRosterEntry(rosterEntry, this, "programmers" + File::separator + programmer2 + ".xml");
+ PrintRosterEntry* pre = new PrintRosterEntry(re, this, "programmers" + File::separator + programmer2 + ".xml");
  pre->printPanes(boo);
 }
 
@@ -1878,26 +1851,26 @@ void RosterFrame::On_Quit()
  {
   if (checkIfEntrySelected())
   {
-   startProgrammer(NULL, rosterEntry, programmer2);
+   startProgrammer(NULL, re, programmer2);
   }
  }
  else if (args.at(0)==("comprehensiveprogrammer"))
  {
   if (checkIfEntrySelected())
   {
-      startProgrammer(NULL, rosterEntry, programmer1);
+      startProgrammer(NULL, re, programmer1);
   }
  } else if (args.at(0)==("editthrottlelabels"))
  {
   if (checkIfEntrySelected())
   {
-      startProgrammer(NULL, rosterEntry, "dp3" + File::separator + "ThrottleLabels");
+      startProgrammer(NULL, re, "dp3" + File::separator + "ThrottleLabels");
   }
  } else if (args.at(0)==("editrostermedia"))
  {
   if (checkIfEntrySelected())
   {
-      startProgrammer(NULL, rosterEntry, "dp3" + File::separator + "MediaPane");
+      startProgrammer(NULL, re, "dp3" + File::separator + "MediaPane");
   }
  }
  else if (args.at(0)==("hiderosterimage"))
@@ -1961,34 +1934,6 @@ void RosterFrame::On_Quit()
  {
 //     rtable.resetColumnWidths();
  }
-#if 0
- else if(args.at(0) == "labelsandmedia")
- {
-  //editMediaButton();
-  FunctionLabelsMediaDlg* dlg = new FunctionLabelsMediaDlg(rosterEntry);
-  dlg->show();
-
- }
- else if(args.at(0) == "throttle")
- {
-  ThrottleWindow* tf =ThrottleFrameManager::instance()->createThrottleFrame();
-  tf->toFront();
-  tf->getAddressPanel()->getRosterEntrySelector()->setSelectedRosterGroup(getSelectedRosterGroup());
-  tf->getAddressPanel()->setRosterEntry(rosterEntry);
- }
- else if(args.at(0) == "duplicate")
- {
-  copyLoco();
- }
- else if(args.at(0) == "deletefromgroup")
- {
-  deleteLoco();
- }
- else if(args.at(0) == "deletefromroster")
- {
-  deleteLoco();
- }
-#endif
  else
  {
   log->error("remote calls method " + args.at(0) + " not found");
@@ -2213,7 +2158,7 @@ void RosterFrame::on_currentMapped(QAction *act) //SLOT[]
  {
   QModelIndex ix = sorter->mapToSource(sorter->index(row,0));
   int row = ix.row();
-  rosterEntry = Roster::getDefault()->getGroupEntry(model->getRosterGroup(), row);
+  re = Roster::getDefault()->getGroupEntry(model->getRosterGroup(), row);
   updateDetails();
 }
      QMenu* popupMenu = new QMenu();
@@ -2227,7 +2172,7 @@ void RosterFrame::on_currentMapped(QAction *act) //SLOT[]
      menuItem->setProperty("action", "comprehensiveprogrammer");
      mapper->setMapping(menuItem, menuItem);
      connect(menuItem, SIGNAL(triggered(bool)), mapper, SLOT(map()));
-     if (rosterEntry == NULL) {
+     if (re == NULL) {
          menuItem->setEnabled(false);
      }
      popupMenu->addAction(menuItem);
@@ -2270,30 +2215,42 @@ void RosterFrame::on_currentMapped(QAction *act) //SLOT[]
      popupMenu->addSeparator();
      menuItem = new QAction("Labels and Media",this);
 //        menuItem.addActionListener((ActionEvent e1) -> {
-//            editMediaButton();
-//        });
-     menuItem->setProperty("action", "labelsandmedia");
-     mapper->setMapping(menuItem, menuItem);
-     connect(menuItem, SIGNAL(triggered(bool)), mapper, SLOT(map()));
-     if (rosterEntry == NULL) {
-         menuItem->setEnabled(false);
-     }
+     connect(menuItem, &QAction::triggered, [=]{
+            editMediaButton();
+        });
      popupMenu->addAction(menuItem);
      menuItem = new QAction("Throttle", this);
      menuItem->setProperty("action", "throttle");
-     mapper->setMapping(menuItem, menuItem);
-     connect(menuItem, SIGNAL(triggered(bool)), mapper, SLOT(map()));
 //        menuItem.addActionListener((ActionEvent e1) -> {
-//            ThrottleFrame tf = ThrottleFrameManager.instance().createThrottleFrame();
-//            tf.toFront();
-//            tf.getAddressPanel().getRosterEntrySelector().setSelectedRosterGroup(getSelectedRosterGroup());
-//            tf.getAddressPanel().setRosterEntry(re);
-//        });
-     if (rosterEntry == NULL) {
+     connect(menuItem, &QAction::triggered, [=] {
+            ThrottleWindow* tf = ThrottleFrameManager::instance()->createThrottleFrame();
+            tf->toFront();
+            tf->getAddressPanel()->getRosterEntrySelector()->setSelectedRosterGroup(getSelectedRosterGroup());
+            tf->getAddressPanel()->setRosterEntry(re);
+        });
+     if (re == NULL) {
          menuItem->setEnabled(false);
      }
      popupMenu->addAction(menuItem);
      popupMenu->addSeparator();
+
+
+     menuItem = new QAction(tr("Print Entry..."),this);
+     //menuItem.addActionListener((ActionEvent e1) -> printLoco(false));
+     connect(menuItem, &QAction::triggered, [=] {printLoco(false);});
+     if (re == nullptr) {
+         menuItem->setEnabled(false);
+     }
+     popupMenu->addAction(menuItem);
+     menuItem = new QAction(tr("Preview Entry..."));
+     //menuItem.addActionListener((ActionEvent e1) -> printLoco(true));
+     connect(menuItem, &QAction::triggered, [=]{printLoco(true);});
+     if (re == nullptr) {
+         menuItem->setEnabled(false);
+     }
+     popupMenu->addAction(menuItem);
+     popupMenu->addSeparator();
+
      menuItem = new QAction("Duplicate", this);
 //        menuItem.addActionListener((ActionEvent e1) -> {
 //            copyLoco();
@@ -2301,7 +2258,7 @@ void RosterFrame::on_currentMapped(QAction *act) //SLOT[]
      menuItem->setProperty("action", "duplicate");
      mapper->setMapping(menuItem, menuItem);
      connect(menuItem, SIGNAL(triggered(bool)), mapper, SLOT(map()));
-     if (rosterEntry == NULL) {
+     if (re == NULL) {
          menuItem->setEnabled(false);
      }
      popupMenu->addAction(menuItem);
@@ -2353,7 +2310,7 @@ void RosterFrame::editMediaButton() {
     bool serviceSelected = ui->service->isChecked();
     bool opsSelected = ui->ops->isChecked();
     ui->edit->setChecked(true);
-    startProgrammer(NULL, rosterEntry, "dp3" + File::separator + "MediaPane");
+    startProgrammer(NULL, re, "dp3" + File::separator + "MediaPane");
     ui->service->setChecked(serviceSelected);
     ui->ops->setChecked(opsSelected);
 }

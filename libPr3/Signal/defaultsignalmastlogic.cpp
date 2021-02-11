@@ -20,6 +20,8 @@
 #include "block.h"
 #include "entrypoint.h"
 #include "layouttrackexpectedstate.h"
+#include "defaultsignalmastlogicmanager.h"
+#include "loggerfactory.h"
 
 class RunnableThis : public Runnable
 {
@@ -32,7 +34,7 @@ class RunnableThis : public Runnable
     {
      try
      {
-        QThread::wait((InstanceManager::signalMastLogicManagerInstance()->getSignalLogicDelay()/2));
+        QThread::wait(((DefaultSignalMastLogicManager*)InstanceManager::getDefault("SignalMastLogicManager"))->getSignalLogicDelay()/2);
         dsml->inWait=false;
         dsml->setMastAppearance();
      }
@@ -81,18 +83,9 @@ class RunnableThis : public Runnable
   throw NullPointerException(tr("source is marked @NonNull but is null."));
  this->source = source;
  destList =  QHash<SignalMast*, DestinationMast*>();
- useAutoGenBlock = true;
- useAutoGenTurnouts = true;
- log = new Logger("DefaultSignalMastLogic");
-
- facingBlock = nullptr;
- protectingBlock = nullptr;
- destList = QHash<SignalMast*, DestinationMast*>();
- disposing = false;
  pcs = new PropertyChangeSupport(this);
  propertyDestinationMastListener = new PropertyDestinationMastListener(this);
  propertySourceMastListener = new PropertySourceMastListener(this);
- inWait = false;
  thr = nullptr;
  try
  {
@@ -112,10 +105,6 @@ class RunnableThis : public Runnable
 /*public*/ void DefaultSignalMastLogic::setFacingBlock(LayoutBlock* facing){
     facingBlock = facing;
 }
-
-///*public*/ void DefaultSignalMastLogic::setProtectingBlock(LayoutBlock* protecting){
-//    protectingBlock = protecting;
-//}
 
 /*public*/ LayoutBlock* DefaultSignalMastLogic::getFacingBlock(){
     return facingBlock;
@@ -400,6 +389,70 @@ class RunnableThis : public Runnable
      return false;
  }
  return destList.value(destination)->useLayoutEditor();
+}
+
+/**
+ * Add direction sensors to SML
+ *
+ * @return number of errors
+ */
+//@Override
+/*public*/ int DefaultSignalMastLogic::setupDirectionSensors() {
+    // iterrate over the signal masts
+    int errorCount = 0;
+    for (SignalMast* sm : getDestinationList()) {
+        QString displayName = sm->getDisplayName();
+        Section* sec = getAssociatedSection(sm);
+        Block* facingBlock = nullptr;
+        if (sec != nullptr) {
+            Sensor* fwd = sec->getForwardBlockingSensor();
+            Sensor* rev = sec->getReverseBlockingSensor();
+            LayoutBlock* lBlock = getFacingBlock();
+            if (lBlock == nullptr) {
+                try {
+                    useLayoutEditor(true, sm); // force a refind
+                } catch (JmriException ex) {
+                    continue;
+                }
+            }
+            if (lBlock != nullptr) {
+                facingBlock = lBlock->getBlock();
+                EntryPoint* fwdEntryPoint = sec->getEntryPointFromBlock(facingBlock, Section::FORWARD);
+                EntryPoint* revEntryPoint = sec->getEntryPointFromBlock(facingBlock, Section::REVERSE);
+                log->debug(tr("Mast[%1] Sec[%2] Fwd[%3] Rev [%4]").arg(
+                        displayName).arg(sec->getDisplayName()).arg(fwd?fwd->getDisplayName():"null").arg(rev?rev->getDisplayName():"null"));
+                if (fwd != nullptr && fwdEntryPoint != nullptr) {
+                    addSensor(fwd->getUserName(), Sensor::INACTIVE, sm);
+                    log->debug(tr("Mast[%1] Sec[%2] Fwd[%3] fwdEP[%4] revEP[%5]").arg(
+                            displayName).arg(sec->getDisplayName()).arg(fwd->getDisplayName()).arg(
+                            fwdEntryPoint->getBlock()->getUserName()));
+
+                } else if (rev != nullptr && revEntryPoint != nullptr) {
+                    addSensor(rev->getUserName(), Sensor::INACTIVE, sm);
+                    log->debug(tr("Mast[%1] Sec[%2] Rev [%3] fwdEP[%4] revEP[%5]").arg(
+                            displayName).arg(sec->getDisplayName()).arg(fwd->getDisplayName()).arg(rev->getDisplayName()).arg(
+                            revEntryPoint->getBlock()->getUserName()));
+
+                } else {
+                    log->error(tr("Mast[%1] Cannot Establish entry point to protected section").arg(displayName));
+                    errorCount += 1;
+                }
+            } else {
+                log->error(tr("Mast[%1] No Facing Block").arg(displayName));
+                errorCount += 1;
+            }
+        } else {
+            log->error(tr("Mast[%1] No Associated Section").arg(displayName));
+            errorCount += 1;
+        }
+    }
+    return errorCount;
+}
+
+//@Override
+/*public*/ void DefaultSignalMastLogic::removeDirectionSensors() {
+    //TODO find aaway of easilty identifying the ones we added.
+    return ;
 }
 
 /**
@@ -2425,7 +2478,7 @@ QMap<Block*, int> DestinationMast::setupLayoutEditorTurnoutDetails(QList<LayoutB
 void DestinationMast::setupAutoSignalMast(SignalMastLogic* sml, bool overright){
     if(!allowAutoSignalMastGeneration)
         return;
-    QList<SignalMastLogic*> smlList = InstanceManager::signalMastLogicManagerInstance()->getLogicsByDestination(destination);
+    QList<SignalMastLogic*> smlList = ((SignalMastLogicManager*)InstanceManager::getDefault("SignalMastLogicManager"))->getLogicsByDestination(destination);
     QList<Block*> allBlock =  QList<Block*>();
 
     foreach(NamedBeanSetting* nbh, userSetBlocks){
@@ -2972,5 +3025,5 @@ protected PropertyChangeListener propertySignalMastLogicManagerListener = new Pr
     return report;
 }
 
-//static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DefaultSignalMastLogic.class.getName());
+/*static*/ Logger*  DefaultSignalMastLogic::log = LoggerFactory::getLogger("DefaultSignalMastLogic");
 //}

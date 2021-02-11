@@ -5,6 +5,7 @@
 #include <QStringList>
 #include "turnout.h"
 #include "abstractmanager.h"
+#include "localdatetime.h"
 
 class TurnoutManager :  public AbstractManager
 {
@@ -45,14 +46,14 @@ public:
          * instance already exists.
          * @return requested Turnout object or null if none exists
          */
-         //NamedBean* getBySystemName(QString /*systemName*/) const =0;
+         virtual Turnout* getBySystemName(QString /*systemName*/) const =0;
 
         /**
          * Locate an instance based on a user name.  Returns null if no
          * instance already exists.
          * @return requested Turnout object or null if none exists
          */
-         //NamedBean* getByUserName(QString /*userName*/) const =0;
+         virtual Turnout* getByUserName(QString /*userName*/) const =0;
 
         /**
          * Return an instance with the specified system and user names.
@@ -174,8 +175,30 @@ public:
         virtual QString getDefaultThrownSpeed() const{return "";}
 
         virtual QString getDefaultClosedSpeed() const {return "";}
+        /**
+         * Get the Interval (in ms) to wait between output commands.
+         * Configured in AdapterConfig, stored in memo.
+         *
+         * @return the (Turnout) Output Interval in milliseconds
+         */
+        virtual /*public*/ int getOutputInterval() {return 0;}
 
-signals:
+        /**
+         * Set the Interval (in ms) to wait between output commands.
+         *
+         * @param newInterval the new Output Interval in Milliseconds
+         */
+        virtual /*public*/ void setOutputInterval(int newInterval) {}
+
+        /**
+         * Get end time of latest OutputInterval, calculated from the current time.
+         *
+         * @return end time in milliseconds or current time if no interval was set or timer has completed
+         */
+        //@Nonnull
+        virtual /*public*/ LocalDateTime outputIntervalEnds() {}
+
+        virtual /*public*/ QString toString() {return "TurnoutManager";}
     
 public slots:
     

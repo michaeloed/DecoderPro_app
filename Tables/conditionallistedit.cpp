@@ -29,6 +29,7 @@
 #include "tablecolumn.h"
 #include "variabletablemodel.h"
 #include "light.h"
+#include "tabledelegates.h"
 
 /**
  * The traditional list based conditional editor based on the original editor
@@ -209,6 +210,7 @@ void ConditionalListEdit::makeEditLogixWindow()
  //     stateColumn->setMaxWidth(100);
  //     TableColumn buttonColumn = conditionalColumnModel
  //             .getColumn(ConditionalTableModel.BUTTON_COLUMN);
+      conditionalTable->setItemDelegateForColumn(ConditionalTableModel::BUTTON_COLUMN, new ButtonEditor());
   #if 0
       // install button renderer and editor
       ButtonRenderer buttonRenderer = new ButtonRenderer();
@@ -441,7 +443,7 @@ bool ConditionalListEdit::validateTime(int actionType, float time) {
 /**
  * Responds to the Reorder Button in the Edit Logix window
  */
-void ConditionalListEdit::reorderPressed(ActionEvent* /*e*/) {
+void ConditionalListEdit::reorderPressed(JActionEvent* /*e*/) {
     if (checkEditConditional())
         return;
     // Check if reorder is reasonable
@@ -470,7 +472,7 @@ void ConditionalListEdit::swapConditional(int row) {
 /**
  * Responds to the Calculate Button in the Edit Logix window
  */
-void ConditionalListEdit::calculatePressed(ActionEvent* /*e*/)
+void ConditionalListEdit::calculatePressed(JActionEvent* /*e*/)
 {
  if (checkEditConditional())
   return;
@@ -515,7 +517,7 @@ void ConditionalListEdit::calculatePressed(ActionEvent* /*e*/)
  *
  * @param e The event heard
  */
-void ConditionalListEdit::donePressed(ActionEvent* /*e*/) {
+void ConditionalListEdit::donePressed(JActionEvent* /*e*/) {
     if (checkEditConditional()) {
         return;
     }
@@ -570,7 +572,7 @@ void ConditionalListEdit::finishDone()
  *
  * @param e The event heard
  */
-void ConditionalListEdit::deletePressed(ActionEvent* e) {
+void ConditionalListEdit::deletePressed(JActionEvent* e) {
     if (checkEditConditional()) {
         return;
     }
@@ -587,7 +589,7 @@ void ConditionalListEdit::deletePressed(ActionEvent* e) {
 /**
  * Responds to the New Conditional Button in Edit Logix Window
  */
-void ConditionalListEdit::newConditionalPressed(ActionEvent* /*e*/)
+void ConditionalListEdit::newConditionalPressed(JActionEvent* /*e*/)
 {
  if (checkEditConditional())
   return;
@@ -1124,7 +1126,7 @@ void ConditionalListEdit::on_deleteConditionalPressed()
 /**
  * Responds to the Add State Variable Button in the Edit Conditional window
  */
-void ConditionalListEdit::addVariablePressed(ActionEvent* /*e*/)
+void ConditionalListEdit::addVariablePressed(JActionEvent* /*e*/)
 {
  if (alreadyEditingActionOrVariable())
  {
@@ -1160,7 +1162,7 @@ void ConditionalListEdit::addVariablePressed(ActionEvent* /*e*/)
 /**
  * Responds to the Check State Variable Button in the Edit Conditional window
  */
-void ConditionalListEdit::checkVariablePressed(ActionEvent* /*e*/) {
+void ConditionalListEdit::checkVariablePressed(JActionEvent* /*e*/) {
     for (int i=0; i<_variableList->size(); i++)
     {
         _variableList->at(i)->evaluate();
@@ -1205,7 +1207,7 @@ void ConditionalListEdit::variableOperatorChanged(int row, QString oper) {
 /*
 * Responds to Add action button in the EditConditional window
 */
-void ConditionalListEdit::addActionPressed(ActionEvent* /*e*/) {
+void ConditionalListEdit::addActionPressed(JActionEvent* /*e*/) {
     if (alreadyEditingActionOrVariable()) {
         return;
     }
@@ -1220,7 +1222,7 @@ void ConditionalListEdit::addActionPressed(ActionEvent* /*e*/) {
 /**
  * Responds to the Reorder Button in the Edit Conditional window
  */
-void ConditionalListEdit::reorderActionPressed(ActionEvent* /*e*/) {
+void ConditionalListEdit::reorderActionPressed(JActionEvent* /*e*/) {
     if (alreadyEditingActionOrVariable()) {
         return;
     }
@@ -1336,7 +1338,7 @@ void ConditionalListEdit::updateConditionalPressed(/*ActionEvent* e*/) {
  * Does the cleanup from deleteConditionalPressed, updateConditionalPressed
  * and editConditionalFrame window closer.
  */
-void ConditionalListEdit::cancelConditionalPressed(ActionEvent* /*e*/) {
+void ConditionalListEdit::cancelConditionalPressed(JActionEvent* /*e*/) {
     if (_pickTables!=NULL) {
         _pickTables->dispose();
         _pickTables = NULL;
@@ -1411,7 +1413,7 @@ void ConditionalListEdit::deleteConditionalPressed(QString sName) {
 
 //@SuppressWarnings("fallthrough")
 //@edu.umd.cs.findbugs.annotations.SuppressWarnings(value="SF_SWITCH_FALLTHROUGH")
-bool ConditionalListEdit::logicTypeChanged(ActionEvent* /*e*/) {
+bool ConditionalListEdit::logicTypeChanged(JActionEvent* /*e*/) {
     int type = _operatorBox->currentIndex() + 1;
     if (type == _logicType) {
             return false;
@@ -1439,7 +1441,7 @@ bool ConditionalListEdit::logicTypeChanged(ActionEvent* /*e*/) {
     return true;
 }
 
-void ConditionalListEdit::helpPressed(ActionEvent* /*e*/) {
+void ConditionalListEdit::helpPressed(JActionEvent* /*e*/) {
 #if 0
     javax.swing.JOptionPane.showMessageDialog(editConditionalFrame,
             new String[] {
@@ -2818,7 +2820,7 @@ bool ConditionalListEdit::validateVariable() {
 
 
 // ------------ Variable detail listeners ------------
-/*public*/ void ConditionalListEdit::variableSignalTestStateListener(ActionEvent* /*e*/) {
+/*public*/ void ConditionalListEdit::variableSignalTestStateListener(JActionEvent* /*e*/) {
     log->debug("variableSignalTestStateListener fires;  _variableItemBox->currentIndex()= "+
               QString::number( _variableItemBox->currentIndex())+
               "\" _variableStateBox->currentIndex()= \""+QString::number(_variableStateBox->currentIndex())+"\"");
@@ -2842,7 +2844,7 @@ bool ConditionalListEdit::validateVariable() {
     }
 }
 
-/*public*/ void ConditionalListEdit::variableSignalHeadNameListener(ActionEvent* /*e*/) {
+/*public*/ void ConditionalListEdit::variableSignalHeadNameListener(JActionEvent* /*e*/) {
         // fired when signal mast name changes, but only
         // while in signal mast mode
         log->debug("variableSignalHeadNameListener fires; _variableNameField : "+_variableNameField->text().trimmed());
@@ -3857,7 +3859,7 @@ void ConditionalListEdit::deleteActionPressed(int row) {
  *
  * @param e the event heard
  */
-void ConditionalListEdit::setFileLocation(ActionEvent* e)
+void ConditionalListEdit::setFileLocation(JActionEvent* e)
 {
  ConditionalAction* action = _actionList->value(_curActionRowNumber);
  JFileChooser* currentChooser;
@@ -4404,7 +4406,7 @@ void ConditionalListEdit::actionSignalMastNameListener() // SLOT[]
 //        PropertyChangeListener {
 
 
-/*public*/ ConditionalTableModel::ConditionalTableModel(QObject* parent) : QAbstractTableModel(parent)
+/*public*/ ConditionalTableModel::ConditionalTableModel(QObject* parent) : AbstractTableModel(parent)
 {
  //super();
  self = (ConditionalListEdit*)parent;
@@ -4459,13 +4461,13 @@ bool ConditionalTableModel::matchPropertyName(PropertyChangeEvent* e) {
             ->getPropertyName().indexOf("Appearance") >= 0);
 }
 
-//    /*public*/ Class<?> getColumnClass(int c) {
-//        if (c == BUTTON_COLUMN) {
-//            return QPushButton.class;
-//        } else {
-//            return String.class;
-//        }
-//    }
+/*public*/ QString ConditionalTableModel::getColumnClass(int c) {
+    if (c == BUTTON_COLUMN) {
+        return "JButton";
+    } else {
+        return "String";
+    }
+}
 
 /*public*/ int ConditionalTableModel::columnCount(const QModelIndex &/*parent*/) const
 {
@@ -4696,34 +4698,34 @@ void ConditionalTableModel::fireTableRowsDeleted(int /*r1*/, int /*r2*/)
  */
 ///*public*/ class VariableTableModel extends AbstractTableModel {
 
-LVariableTableModel::LVariableTableModel(QObject* parent) : QAbstractTableModel(parent)
+LVariableTableModel::LVariableTableModel(QObject* parent) : AbstractTableModel(parent)
 {
   self = (ConditionalListEdit*) parent;
 
 }
 
-//    /*public*/ Class<?> getColumnClass(int c) {
-//        switch (c)
-//        {
-//            case ROWNUM_COLUMN:
-//                return String.class;
-//            case AND_COLUMN:
-//                return JComboBox.class;
-//            case NOT_COLUMN:
-//                return JComboBox.class;
-//            case DESCRIPTION_COLUMN:
-//                return String.class;
-//            case STATE_COLUMN:
-//                return String.class;
-//            case TRIGGERS_COLUMN:
-//                return Boolean.class;
-//            case EDIT_COLUMN:
-//                return QPushButton.class;
-//            case DELETE_COLUMN:
-//                return QPushButton.class;
-//        }
-//        return String.class;
-//    }
+/*public*/ QString LVariableTableModel::getColumnClass(int c) {
+    switch (c)
+    {
+        case ROWNUM_COLUMN:
+            return "String";
+        case AND_COLUMN:
+            return "JComboBox";
+        case NOT_COLUMN:
+            return "JComboBox";
+        case DESCRIPTION_COLUMN:
+            return "String";
+        case STATE_COLUMN:
+            return "String";
+        case TRIGGERS_COLUMN:
+            return "Boolean";
+        case EDIT_COLUMN:
+            return "JButton";
+        case DELETE_COLUMN:
+            return "JButton";
+    }
+    return "String";
+}
 
 /*public*/ int LVariableTableModel::columnCount(const QModelIndex &/*parent*/) const
 {
@@ -4954,18 +4956,18 @@ void LVariableTableModel::fireTableRowsUpdated(int /*row1*/, int /*row2*/)
  */
 // /*public*/ class ActionTableModel extends AbstractTableModel {
 
-ActionTableModel::ActionTableModel(QObject *parent) : QAbstractTableModel(parent)
+ActionTableModel::ActionTableModel(QObject *parent) : AbstractTableModel(parent)
 {
     this->self = (ConditionalListEdit*)parent;
 }
 
-//    /*public*/ Class<?> getColumnClass(int c) {
-//        if (c == EDIT_COLUMN || c ==DELETE_COLUMN )
-//        {
-//            return QPushButton.class;
-//        }
-//        return super.getColumnClass(c);
-//    }
+/*public*/ QString ActionTableModel::getColumnClass(int c) {
+ if (c == EDIT_COLUMN || c ==DELETE_COLUMN )
+ {
+     return "JButton";
+ }
+ return AbstractTableModel::getColumnClass(c);
+}
 
 /*public*/ int ActionTableModel::columnCount(const QModelIndex &/*parent*/) const
 {

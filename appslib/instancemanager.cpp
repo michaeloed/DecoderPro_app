@@ -72,7 +72,7 @@
 #include <QApplication>
 //#include "proxymanager.h"
 #include "proxylightmanager.h"
-
+#include "proxymetermanager.h"
 
 class ManagerLists : public QHash<QString,QObjectList*>
 {
@@ -577,6 +577,21 @@ void InstanceManager::deregister(QObject* item, QString type)
 }
 
 /**
+ * Check if a particular type has been initialized without
+ * triggering an automatic initialization. The existence or
+ * non-existence of the corresponding list is not changed, and
+ * no PropertyChangeEvent is fired.
+ *
+ * @param <T>  The type of the class
+ * @param type The class type
+ * @return true if an item is available as a default for the given type;
+ *         false otherwise
+ */
+/*public*/ /*static*/ /*<T>*/ bool InstanceManager::isInitialized(/*@Nonnull*/ QString type) {
+    return getDefault()->managerLists.value(type) != nullptr;
+}
+
+/**
  * Dump generic content of InstanceManager
  * by type.
  */
@@ -648,21 +663,6 @@ void InstanceManager::deregister(QObject* item, QString type)
     getDefault()->pcs->addPropertyChangeListener(propertyName, l);
 }
 
-PowerManager* InstanceManager::powerManagerInstance()
-{
- return (PowerManager*)getDefault("PowerManager");
-}
-
-//void InstanceManager::setPowerManager(PowerManager* p)
-//{
-//    //store(p, p->metaObject()->className());
-//    store(p,"PowerManager");
-//}
-
-//ProgrammerManager* InstanceManager::programmerManagerInstance()
-//{
-// return (ProgrammerManager*)getDefault("ProgrammerManager");
-//}
 
 SensorManager* InstanceManager::sensorManagerInstance()
 {
@@ -700,106 +700,7 @@ ThrottleManager* InstanceManager::throttleManagerInstance()  {
     return (ThrottleManager*)getDefault(/*ThrottleManager.class*/  "ThrottleManager");
 }
 
-/**
- * Will eventually be deprecated, use @{link #getDefault} directly.
- *
- * @return the default signal head manager. May not be the only instance.
- * @deprecated 4.5.1
- */
-//@Deprecated
-//SignalHeadManager* InstanceManager::signalHeadManagerInstance()
-//{
-////    if (instance()->signalHeadManager != NULL) return instance()->signalHeadManager;
-////    // As a convenience, we create a default object if none was provided explicitly.
-////    // This must be replaced when we start registering specific implementations
-////    //instance()->signalHeadManager = (SignalHeadManager*)initializer->getDefault(/*SignalHeadManager.class)*/"SignalHeadManager");
-////    instance()->signalHeadManager = (SignalHeadManager*)new  AbstractSignalHeadManager();
-////    return instance()->signalHeadManager;
-// return (SignalHeadManager*)getDefault("SignalHeadManager");
-//}
 
-/**
- * Will eventually be deprecated, use @{link #getDefault} directly.
- *
- * @return the default signal mast manager. May not be the only instance.
- * @deprecated 4.5.1
- */
-//@Deprecated
-//SignalMastManager* InstanceManager::signalMastManagerInstance()
-//{
-// SignalMastManager* m = (SignalMastManager*)getDefault("SignalMastManager");
-//// if (m == nullptr)
-//// {
-////  m = (SignalMastManager*)initializer->getDefault("SignalMastManager");
-////  setSignalMastManager(m);
-//// }
-// return m;
-//}
-//void InstanceManager::setSignalMastManager(SignalMastManager* p)
-//{
-//    store(p, "SignalMastManager");
-//}
-
-//SignalSystemManager* InstanceManager::signalSystemManagerInstance()
-//{
-// SignalSystemManager* m = (SignalSystemManager*)getDefault("SignalSystemManager");
-// if (m == nullptr)
-// {
-//  m = (SignalSystemManager*)initializer->getDefault("SignalSystemManager");
-//  setSignalSystemManager(m);
-// }
-// return m;
-//}
-
-//void InstanceManager::setSignalSystemManager(SignalSystemManager* p) {
-//    store(p, "SignalSystemManager");
-//}
-
-//SignalGroupManager* InstanceManager::signalGroupManagerInstance()  {
-// SignalGroupManager* m = (SignalGroupManager*)getDefault("DefaultSignalGroupManager");
-// if (m == nullptr) {
-//     m = (SignalGroupManager*)initializer->getDefault("SignalGroupManager");
-//     setSignalGroupManager(m);
-// }
-// return m;
-//}
-
-//void InstanceManager::setSignalGroupManager(SignalGroupManager* p) {
-//    store(p, "SignalGroupManager");
-//}
-
-//BlockManager* InstanceManager::blockManagerInstance()
-//{
-// BlockManager* o = (BlockManager*)getDefault("BlockManager");
-// if (o != nullptr) return o;
-// o = (BlockManager*)initializer->getDefault("BlockManager");
-// store(o, "BlockManager");
-// return o;
-//}
-
-//SectionManager* InstanceManager::sectionManagerInstance()
-//{
-// return (SectionManager*)getDefault("SectionManager");
-//}
-
- SignalMastLogicManager* InstanceManager::signalMastLogicManagerInstance()  {
-     SignalMastLogicManager* r = (SignalMastLogicManager*)getDefault("SignalMastLogicManager");
-    if (r != nullptr) return r;
-    r = (SignalMastLogicManager*)initializer->getDefault("SignalMastLogicManager");
-    store((QObject*)r, "SignalMastLogicManager");
-    return r;
-}
-
-RouteManager* InstanceManager::routeManagerInstance()
-{
-    RouteManager* r = (RouteManager*)getDefault("RouteManager");
-    if (r != nullptr) return r;
-    r = (RouteManager*)initializer->getDefault("RouteManager");
-    store(r, "RouteManager");
-    return r;
-}
-
-ReporterManager* InstanceManager::reporterManagerInstance()  { return (ReporterManager*) getDefault("ReporterManager"); }
 /* ****************************************************************************
  *                   Primary Accessors - Left (for now)
  *
@@ -823,30 +724,6 @@ MemoryManager* InstanceManager::memoryManagerInstance()
 {
  return static_cast<MemoryManager*>(getDefault("MemoryManager"));
 }
-//VSDecoderManager InstanceManager::vsdecoderManagerInstance() {
-//if (instance()->vsdecoderManager == NULL) instance()->vsdecoderManager = VSDecoderManager.instance();
-//return instance()->vsdecoderManager;
-//}
-
-//InstanceManager* InstanceManager::instance()
-//{
-// if (root==nullptr)
-// {
-//  setRootInstance();
-// }
-// return root;
-//}
-
-//void InstanceManager::setRootInstance()
-//{
-// if(root!=nullptr)
-//  return;
-// root = new InstanceManager();
-//}
-
-//    public InstanceManager() {
-//        init();
-//    }
 void InstanceManager::setSensorManager(SensorManager* p)
 {
  log->debug(" setSensorManager");
@@ -871,6 +748,24 @@ void InstanceManager::setSensorManager(SensorManager* p)
         ((ProxyManager*) apm)->addManager(p);
     } else {
         log->error("Incorrect setup: IdTagManager default isn't an AbstractProxyManager<IdTag>");
+    }
+#endif
+}
+
+
+// Needs to have proxy manager converted to work
+// with current list of managers (and robust default
+// management) before this can be deprecated in favor of
+// store(p, MeterManager.class)
+//@SuppressWarnings("unchecked") // AbstractProxyManager of the right type is type-safe by definition
+/*static*/ /*public*/ void InstanceManager::setMeterManager(MeterManager* p) {
+    log->debug(" setMeterManager");
+#if 1
+    MeterManager* apm = (ProxyMeterManager*)getDefault("MeterManager");
+    if (qobject_cast<ProxyManager*>(apm)) { // <?> due to type erasure
+        ((ProxyMeterManager/*<Meter*>*/*) apm)->addManager(p);
+    } else {
+        log->error("Incorrect setup: MeterManager default isn't an AbstractProxyManager<Meter>");
     }
 #endif
 }
@@ -906,54 +801,13 @@ void InstanceManager::setThrottleManager(ThrottleManager* p)
     //instance()->notifyPropertyChangeListener("throttlemanager", QVariant(), QVariant());
 }
 
-void InstanceManager::setSignalHeadManager(SignalHeadManager* p) {
-    setDefault("SignalHeadManager", p);
-}
-
-void InstanceManager::setConsistManager(ConsistManager* p) {
-    store(p->self(), "ConsistManager");
-    //instance()->notifyPropertyChangeListener("consistmanager", QVariant(), QVariant());
-}
-
-//
-// This updates the consist manager, which must be
-// either built into instances of calling code or a
-// new service, before this can be deprecated.
-//
-//@Deprecated
-///*static*/ /*public*/ void InstanceManager::setCommandStation(CommandStation* p)
-//{
-// store(p, "CommandStation");
-//}
-
-/**
- * @param p CommandStation to make default
- * @deprecated Since 4.9.5, use
- * {@link #store(java.lang.Object,java.lang.Class)} directly.
- */
-//@Deprecated
-///*static*/ /*public*/ void InstanceManager::setAddressedProgrammerManager(AddressedProgrammerManager* p) {
-//    store(p, "AddressedProgrammerManager");
-//}
-
 void InstanceManager::setReporterManager(ReporterManager* p) {
  log->debug(" setReporterManager");
    ((AbstractProxyReporterManager*) getDefault("ReporterManager"))->addManager(p);
    //store(p, ReporterManager.class);
 }
 
-//void InstanceManager::addReporterManager(ReporterManager* p) {
-//    ((AbstractProxyManager*)instance()->reporterManager)->addManager(p);
-//}
 
-///*public*/ /*static*/ /*synchronized*/ void InstanceManager::addPropertyChangeListener(PropertyChangeListener* l) {
-// //QMutex mutex;
-//    QMutexLocker locker(&mutex);
-//    // add only if not already registered
-//    if (!listeners.contains(l)) {
-//        listeners.append(l);
-//    }
-//}
 
 /**
  * Trigger the notification of all PropertyChangeListeners
@@ -999,42 +853,6 @@ void InstanceManager::notifyPropertyChangeListener(QString property, QVariant ol
 /*public*/ /*static*/ QString InstanceManager::getListPropertyName(/*Class<?>*/QString clazz) {
     return "list-" + clazz/*.getName()*/;
 }
-/* ****************************************************************************
- *                   Old Style Setters - Deprecated and migrated,
- *                                       just here for other users
- *
- *                     Check Jython scripts before removing
- * ****************************************************************************/
-///**
-// * @deprecated Since 3.7.1, use @{link #store} and @{link #setDefault} directly.
-// */
-//@Deprecated
-//static public void setConditionalManager(ConditionalManager p) {
-//    store(p, ConditionalManager.class);
-//    setDefault(ConditionalManager.class, p);
-//}
-///**
-// * @deprecated Since 3.7.4, use @{link #store} directly.
-// */
-//@Deprecated
-//static public void setLogixManager(LogixManager p) {
-//    store(p, LogixManager.class);
-//}
-///**
-// * @deprecated Since 3.7.4, use @{link #store} directly.
-// */
-//@Deprecated
-//static public void setTabbedPreferences(TabbedPreferences p) {
-//    store(p, TabbedPreferences.class);
-//}
-///**
-// * @deprecated Since 3.7.1, use @{link #store} and @{link #setDefault}
-// * directly.
-// */
-// @Deprecated
-// static public void setPowerManager(PowerManager p) {
-//     store(p, PowerManager.class);
-// }
 /**
  * Clear all managed instances from the common instance manager, effectively
  * installing a new one.

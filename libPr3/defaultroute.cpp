@@ -74,7 +74,7 @@ void DefaultRoute::init()
  _locked = false;
 }
 
-/*public*/ bool DefaultRoute::getEnabled() {
+/*public*/ bool DefaultRoute::getEnabled() const{
     return _enabled;
 }
 /*public*/ void DefaultRoute::setEnabled(bool v) {

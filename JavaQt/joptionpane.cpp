@@ -476,7 +476,7 @@
 //        getRootFrame() : parentComponent).getComponentOrientation());
 
     int style = styleFromMessageType(messageType);
-    JDialog* dialog = pane->createDialog(parentComponent, title, style);
+    JDialog* dialog = pane->createDialog(parentComponent, title, style,0);
 
     pane->selectInitialValue();
     dialog->show();
@@ -766,15 +766,25 @@
 {
  JOptionPane* pane = new JOptionPane(message, messageType,
                                      optionType, icon,
-                                     options, initialValue);
+                                     options, initialValue,parentComponent);
 
  pane->setInitialValue(initialValue);
 //    pane->setComponentOrientation(((parentComponent == NULL) ?
 //        getRootFrame() : parentComponent).getComponentOrientation());
 
  int style = styleFromMessageType(messageType);
- JDialog* dialog = pane->createDialog(parentComponent, title, style);
-
+ JDialog* dialog = pane->createDialog(parentComponent, title, style, optionType);
+ QWidget* w = VPtr<QListWidget>::asPtr(message);
+ if(w)
+ {
+  QListWidget* list = w->findChild<QListWidget*>();
+  if(list)
+  {
+   connect(list, &QListWidget::doubleClicked, [=]{
+    dialog->accept();
+   });
+  }
+ }
  pane->selectInitialValue();
 #if 1
  //dialog->show();
@@ -841,7 +851,7 @@ if(options.count() >0)
 /*public*/ JDialog* JOptionPane::createDialog(QWidget* parentComponent, QString title)
     /*throw HeadlessException*/ {
     int style = styleFromMessageType(getMessageType());
-    return createDialog(parentComponent, title, style);
+    return createDialog(parentComponent, title, style, 0);
 }
 
 /**
@@ -874,7 +884,7 @@ if(options.count() >0)
 }
 #endif
 /*private*/ JDialog* JOptionPane::createDialog(QWidget* parentComponent, QString title,
-        int style)
+        int style, int optionType)
         //throws HeadlessException
 {
 
@@ -900,6 +910,7 @@ if(options.count() >0)
         dialog.addWindowListener(ownerShutdownListener);
     }
 #endif
+    setOptionType(optionType);
     dialog = new JDialog(window, title, true);
     initDialog(dialog, style, parentComponent);
     return dialog;
@@ -967,7 +978,6 @@ if(options.count() >0)
 //    });
 
     //addPropertyChangeListener(listener);
-
 }
 /*public*/ void JOptionPane::propertyChange(PropertyChangeEvent* event) {
     // Let the defaultCloseOperation handle the closing

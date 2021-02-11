@@ -11,13 +11,12 @@
 #include <QSet>
 #include "exceptions.h"
 #include <QVector>
+#include "namedbean.h"
 
 class NamedBeanPropertyDescriptor;
 class Logger;
 class SystemConnectionMemo;
-class QString;
 class QStringList;
-class NamedBean;
 class PropertyChangeListener;
 class JAVAQTSHARED_EXPORT
   Manager : public QObject
@@ -103,7 +102,7 @@ public:
   */
  //@CheckReturnValue
  //@Nonnull
- /*public*/ virtual SystemConnectionMemo* getMemo() {return nullptr;}
+ /*public*/ virtual SystemConnectionMemo* getMemo() const =0;
 
 /**
  * Provides access to the system prefix string.
@@ -390,8 +389,8 @@ public:
       virtual /*public*/ void deleteBean(/*@Nonnull*/ NamedBean* /*n*/, /*@Nonnull*/ QString /*property*/) throw (PropertyVetoException) {}
  static /*final*/ Logger* deprecatedManagerLogger;// = LoggerFactory::getLogger("Manager");
 
- virtual /*public*/ NamedBean* getBySystemName(/*@Nonnull*/ QString systemName) const =0;
- virtual /*public*/ NamedBean* getByUserName(/*@Nonnull*/ QString userName) const =0;
+//  /*public*/ NamedBean* getBySystemName(/*@Nonnull*/ QString systemName);
+//  /*public*/ NamedBean* getByUserName(/*@Nonnull*/ QString userName);
  virtual /*default*/ /*public*/ QList<NamedBeanPropertyDescriptor*> getKnownBeanProperties();
 
 
@@ -433,13 +432,27 @@ public:
      static const   int WARRANTS = ROUTES + 10;
      static const   int SIGNALMASTLOGICS = WARRANTS + 10;
      static const   int IDTAGS = SIGNALMASTLOGICS + 10;
-     static const   int LOGIXS = IDTAGS + 10;
+     static const   int ANALOGIOS = IDTAGS + 10;
+     static const   int METERS = ANALOGIOS + 10;
+     static const   int STRINGIOS = METERS + 10;
+     static const   int LOGIXS = STRINGIOS + 10;
      static const   int CONDITIONALS = LOGIXS + 10;
-     static const   int AUDIO = LOGIXS + 10;
+     static const   int AUDIO = CONDITIONALS + 10;
      static const   int TIMEBASE = AUDIO + 10;
      static const   int PANELFILES = TIMEBASE + 10;
      static const   int ENTRYEXIT = PANELFILES + 10;
-
+     static const   int LOGIXNGS = ENTRYEXIT + 10;                          // LogixNG
+     static const   int LOGIXNG_CONDITIONALNGS = LOGIXNGS + 10;             // LogixNG ConditionalNG
+     static const   int LOGIXNG_TABLES = LOGIXNG_CONDITIONALNGS + 10;       // LogixNG Tables (not bean tables)
+     static const   int LOGIXNG_DIGITAL_EXPRESSIONS = LOGIXNG_TABLES + 10;          // LogixNG Expression
+     static const   int LOGIXNG_DIGITAL_ACTIONS = LOGIXNG_DIGITAL_EXPRESSIONS + 10; // LogixNG Action
+     static const   int LOGIXNG_DIGITAL_BOOLEAN_ACTIONS = LOGIXNG_DIGITAL_ACTIONS + 10;   // LogixNG Digital Boolean Action
+     static const   int LOGIXNG_ANALOG_EXPRESSIONS = LOGIXNG_DIGITAL_BOOLEAN_ACTIONS + 10;  // LogixNG AnalogExpression
+     static const   int LOGIXNG_ANALOG_ACTIONS = LOGIXNG_ANALOG_EXPRESSIONS + 10;   // LogixNG AnalogAction
+     static const   int LOGIXNG_STRING_EXPRESSIONS = LOGIXNG_ANALOG_ACTIONS + 10;   // LogixNG StringExpression
+     static const   int LOGIXNG_STRING_ACTIONS = LOGIXNG_STRING_EXPRESSIONS + 10;   // LogixNG StringAction
+     static const   int METERFRAMES = LOGIXNG_STRING_ACTIONS + 10;
+     static const   int CTCDATA = METERFRAMES + 10;
      virtual int getXMLOrder() const =0;
      /**
       * For instances in the code where we are dealing with just a bean and a
@@ -479,6 +492,7 @@ public:
      //@CheckReturnValue
      static /*public*/
      int getSystemPrefixLength(/*@Nonnull*/ QString inputName) throw (NamedBean::BadSystemNameException);
+     /*public*/ static QString getSystemPrefix(/*@Nonnull*/ QString inputName);
 
      /**
           * Indicate whether a system-prefix is one of the legacy non-parsable ones
@@ -639,6 +653,7 @@ public:
       * @param muted true if notifications should be suppressed; false otherwise
       */
      /*public*/ /*default*/ void setDataListenerMute(bool muted);
+     virtual /*public*/QString toString() {return "Manager";}
 
 signals:
     void vetoablePropertyChange(PropertyChangeEvent*);

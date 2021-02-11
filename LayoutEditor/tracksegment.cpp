@@ -1410,7 +1410,7 @@ TrackSegment::getLayoutBlock()
     });
 #endif
 }
-
+#if 0
 /**
  * Display popup menu for information and editing
  */
@@ -2427,7 +2427,7 @@ TrackSegment::getLayoutBlock()
  popupMenu->exec(QCursor::pos());
  return popupMenu;
 }   // showPopup
-
+#endif
 void TrackSegment::onBridgeSideLeft()
 {
  setBridgeSideLeft(true);
@@ -2724,7 +2724,7 @@ void TrackSegment::changeType(int choice) {
 TSAbstractAction::TSAbstractAction(QString name, QObject *parent)
  : AbstractAction(name, parent) {}
 
-/*public*/ void TSAbstractAction::actionPerformed(ActionEvent* /*e*/)
+/*public*/ void TSAbstractAction::actionPerformed(JActionEvent* /*e*/)
 {
  AbstractAction*  routeTableAction = new  LayoutBlockRouteTableAction("ViewRouting", ((TrackSegment*)parent())->getLayoutBlock());
  routeTableAction->actionPerformed();

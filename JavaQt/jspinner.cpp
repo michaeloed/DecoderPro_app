@@ -10,6 +10,7 @@ JSpinner::JSpinner(QWidget *parent) : QSpinBox(parent)
 
 }
 
+
 JSpinner::JSpinner(SpinnerModel* model, QWidget* parent) : QSpinBox(parent)
 {
  setModel(model);
@@ -116,4 +117,19 @@ JSpinner::JSpinner(SpinnerModel* model, QWidget* parent) : QSpinBox(parent)
 /*private*/ void JSpinner::focusOutEvent(QFocusEvent* e)
 {
  emit focusLost(new FocusEvent());
+}
+
+/*public*/ void JSpinner::setTickInterval(int i)
+{
+
+}
+
+/*public*/ void JSpinner::setTickPosition(int i)
+{
+
+}
+
+/*public*/ void JSpinner::setEnabled(bool b)
+{
+ QSpinBox::setEnabled(b);
 }

@@ -42,6 +42,7 @@ public:
  /*public*/ int rowCount(const QModelIndex &parent) const override;
  /*public*/ int columnCount(const QModelIndex &parent) const override;
  /*public*/ QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+ /*public*/ QString getColumnClass(int col) const override;
  /*public*/ Qt::ItemFlags flags(const QModelIndex &index) const override;
  /*public*/ QVariant data(const QModelIndex &index, int role) const override;
  virtual /*public*/ int getPreferredWidth(int col) ;
@@ -61,7 +62,7 @@ public:
 // /*public*/ void loadTableColumnDetails(JTable* table);
 // QT_DEPRECATED/*public*/ void loadTableColumnDetails(JTable* table, QString beantableref);
  /*public*/ void printTable(HardcopyWriter* w);
- /*public*/ JTable* makeJTable(/*@Nonnull */QString name, /*@Nonnull */TableModel* model, /*@Nullable*/ RowSorter* /*<? extends TableModel>*/ sorter);
+ /*public*/ virtual JTable* makeJTable(/*@Nonnull */QString name, /*@Nonnull */TableModel* model, /*@Nullable*/ RowSorter* /*<? extends TableModel>*/ sorter);
  QT_DEPRECATED/*public*/ JTable* makeJTable(QSortFilterProxyModel* sorter);
  /*public*/ void copyName(int);
  /*public*/ void renameBean(int);
@@ -87,15 +88,15 @@ public slots:
  virtual void /*public*/ init();
 
 private:
- Logger* log;
+ static Logger* log;
  bool noWarnDelete;// = false;
  virtual void doDelete(NamedBean* bean);
- QDialog* dialog;
- QCheckBox* remember;
+ QDialog* dialog = nullptr;
+ QCheckBox* remember = nullptr;
  NamedBeanHandleManager* nbMan;// = InstanceManager.getDefault("NamedBeanHandleManager");
- NamedBean* t;
+ NamedBean* t = nullptr;
  //QList<int> buttonMap;
- JTable* _table;
+ //JTable* _table = nullptr;
  int row;
  //void setPersistentButtons();
 
@@ -121,6 +122,8 @@ protected:
  /*protected*/ void showTableHeaderPopup(QMouseEvent* e, JTable* table);
  /*protected*/ int getPropertyColumnCount() const;
  /*protected*/ /*final*/ QList<NamedBeanPropertyDescriptor*>* propertyColumns = nullptr;
+ /*protected*/ NamedBeanPropertyDescriptor *getPropertyColumnDescriptor(int column);
+ /*protected*/ JTable* configureJTable(/*@Nonnull*/ QString name, /*@Nonnull*/ JTable* table, /*@CheckForNull*/ RowSorter/*<? extends TableModel>*/* sorter);
 
 protected slots:
  void On_itemClicked(QModelIndex);
@@ -148,6 +151,9 @@ friend class LTFTabbedTableItem;
 friend class AbstractTableAction;
 friend class TurnoutTableDataModel;
 friend class SignalMastTableAction;
+friend class OBlockTableAction;
+friend class TTComboBoxDelegate;
+friend class SensorTableDataModel;
 };
 
 

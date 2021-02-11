@@ -49,7 +49,7 @@ public slots:
   /*public*/ /*abstract*/ virtual void propertyChange(PropertyChangeEvent* e);
  void on_dccNumBox();
  void on_rosterBoxCurrentIndexChanged(QString);
- /*public*/ void actionPerformed(ActionEvent* /*e*/); // actionEvent required!
+ /*public*/ void actionPerformed(JActionEvent* /*e*/); // actionEvent required!
  void onButton();
 
 private:
@@ -158,7 +158,7 @@ public slots:
     void on_pathBox_currentIndexChanged(int);
     void on_portalBox_currentIndexChanged(int);
 signals:
-    void actionPerformed(ActionEvent *e);
+    void actionPerformed(JActionEvent *e);
 
 private:
     /*private*/ QWidget* makePanel(QString title, QString tooltip, QString box1Name, QString box2Name, WarrantRoute* parent);
@@ -210,6 +210,7 @@ public:
     /*public*/ int rowCount(const QModelIndex &parent) const;
     /*public*/ QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     /*public*/ Qt::ItemFlags flags(const QModelIndex &index) const;
+    /*public*/ QString getColumnClass(int col);
     /*public*/ int getPreferredWidth(int col);
     /*public*/ QVariant data(const QModelIndex &index, int role) const;
     /*public*/ bool setData(const QModelIndex &index, const QVariant &value, int role);
@@ -235,7 +236,7 @@ class SelectActionListener : public ActionListener
  DefaultTreeModel* tree;
  WarrantRoute* caller;
 public slots:
- /*public*/ void actionPerformed(ActionEvent* /*e*/ = 0)
+ /*public*/ void actionPerformed(JActionEvent* /*e*/ = 0)
  {
   if (buts->checkedButton()!=NULL)
   {
@@ -268,7 +269,7 @@ class ShowActionListener : public ActionListener
  DefaultTreeModel* tree;
  WarrantRoute* caller;
 public slots:
- /*public*/ void actionPerformed(ActionEvent* /*e*/ = 0)
+ /*public*/ void actionPerformed(JActionEvent* /*e*/ = 0)
  {
   if (buts->checkedButton()!=NULL)
   {

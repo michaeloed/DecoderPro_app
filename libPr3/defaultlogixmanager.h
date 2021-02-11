@@ -19,25 +19,21 @@ public:
     /*public*/ void deleteLogix(Logix* x) override;
     /*public*/ void activateAllLogixs() override;
     /*public*/ Logix* getLogix(QString name) override;
-    /*public*/ NamedBean* getBySystemName(QString name)const override;
-    /*public*/ NamedBean* getByUserName(QString key)const override;
+    /*public*/ Logix* getBySystemName(QString name)const override;
+    /*public*/ Logix* getByUserName(QString key)const override;
     /*public*/ void setLoadDisabled(bool s) override;
-    /*public*/ bool getLoadDisabled()const override;
     static DefaultLogixManager* _instance;// = NULL;
-    static /*public*/ DefaultLogixManager* instance();
-    /*public*/ QString getNamedBeanClass()const override {
-        return "Logix";
-    }
+    QT_DEPRECATED static /*public*/ DefaultLogixManager* instance();
+    /*public*/ QString getBeanTypeHandled(bool plural) const override;
+    /*public*/ QString getNamedBeanClass()const override ;
 
 signals:
-    //void newLogixCreated(Logix* );
-public slots:
+
+ public slots:
 private:
     DecimalFormat* paddedNumber;// = new DecimalFormat("0000");
-
-    int lastAutoLogixRef;// = 0;
     bool loadDisabled = false;
-    Logger* log;
+    static Logger* log;
 };
 
 #endif // DEFAULTLOGIXMANAGER_H

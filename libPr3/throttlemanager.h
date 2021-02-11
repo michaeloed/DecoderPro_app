@@ -108,7 +108,24 @@ virtual bool requestThrottle(int /*address*/, ThrottleListener* /*l*/) {return f
  * @return True if the request will continue, false if the request will not
  * be made. False may be returned if a the throttle is already in use.
  */
-virtual bool  requestThrottle(int /*address*/, bool  /*isLong*/, ThrottleListener* /*l*/) {return false;}
+QT_DEPRECATED virtual bool  requestThrottle(int /*address*/, bool  /*isLong*/, ThrottleListener* /*l*/) {return false;}
+
+/**
+ * Request a throttle, given a decoder address and whether it is a long or
+ * short DCC address. When the decoder address is located, the
+ * ThrottleListener gets a callback via the
+ * ThrottleListener.notifyThrottleFound method.
+ *
+ * @param address desired decoder address
+ * @param isLong  true if requesting a DCC long (extended) address
+ * @param l       ThrottleListener awaiting notification of a found throttle
+ * @param canHandleDecisions true if the ThrottleListener has a mechanism for dealing with
+ *                Share / Steal decisions, else false
+ * @return true if the request will continue, false if the request will not
+ *         be made; false may be returned if a the throttle is already in
+ *         use
+ */
+/*public*/ virtual bool requestThrottle(int address, bool isLong, ThrottleListener* l, bool canHandleDecisions) {return false;}
 
 /**
  * Request a throttle, given a decoder address. When the decoder address
@@ -122,7 +139,7 @@ virtual bool  requestThrottle(int /*address*/, bool  /*isLong*/, ThrottleListene
  * @return True if the request will continue, false if the request will not
  * be made. False may be returned if a the throttle is already in use.
  */
-QT_DEPRECATED virtual bool  requestThrottle(DccLocoAddress* /*address*/, ThrottleListener* /*l*/) {return false;}
+QT_DEPRECATED virtual bool  requestThrottle(LocoAddress* /*address*/, ThrottleListener* /*l*/) {return false;}
 
 /**
  * Request a throttle, given a LocoAddress. When the address is
@@ -151,7 +168,7 @@ virtual /*public*/ bool requestThrottle(LocoAddress* /*address*/, ThrottleListen
  * @return True if the request will continue, false if the request will not
  * be made. False may be returned if a the throttle is already in use.
  */
-QT_DEPRECATED virtual bool  requestThrottle(DccLocoAddress* /*address*/, BasicRosterEntry* /*re*/, ThrottleListener* /*l*/) {return false;}
+QT_DEPRECATED virtual bool  requestThrottle(LocoAddress* /*address*/, BasicRosterEntry* /*re*/, ThrottleListener* /*l*/) {return false;}
 /**
  * Request a throttle from a given RosterEntry. When the decoder address is
  * located, the ThrottleListener gets a callback via the
@@ -330,11 +347,11 @@ virtual LocoAddress* getAddress(QString /*value*/, LocoAddress::Protocol /*proto
 virtual int getMode(int /*address*/) {return 0;}
 
 /**
- * What speed modes are supported by this system?
- * value should be xor of possible modes specifed in the throttle
- * interface
+ * Get the supported speed modes.
+ *
+ * @return an XOR of the possible modes specified in the throttle interface
  */
-virtual int supportedSpeedModes() {return 0;}
+/*public*/ virtual QSet<SpeedStepMode::SSMODES> supportedSpeedModes() {return QSet<SpeedStepMode::SSMODES>();}
 
 /**
  * Provides a Proxy method to return the SpeedSetting, Direction, Function
@@ -354,9 +371,9 @@ virtual int supportedSpeedModes() {return 0;}
  * @return the value as an objet, if the loco address has not been assigned
  * to a throttle or the item value is not valid, null is returned.
  */
-    virtual QVariant getThrottleInfo(DccLocoAddress* /*la*/, QString /*item*/) {return QVariant();}
+    virtual QVariant getThrottleInfo(LocoAddress* /*la*/, QString /*item*/) {return QVariant();}
 
-    virtual bool addressStillRequired(DccLocoAddress* /*la*/) {return false;}
+    virtual bool addressStillRequired(LocoAddress* /*la*/) {return false;}
 
 /**
  * The specified Throttle Listener has finished using a given throttle and
@@ -405,17 +422,17 @@ virtual void dispatchThrottle(DccThrottle* /*t*/, ThrottleListener* /*l*/) {}
 
 /**
  * Attach a PropertyChangeListener to a specific loco address, where the
- * requesting code does not need or require control over the loco.
- * If the loco address is not in the active in the list, then a new throttle
- * will be created by the manager and the listener attached.
- * <P>
- * The propertyChangeListener will be notified if it has been attached to a
- * loco address or not, via a propertyChange notification.
+ * requesting code does not need or require control over the loco. If the
+ * loco address is not in the active in the list, then a new throttle will
+ * be created by the manager and the listener attached.
  * <p>
- * @param la - DccLocoAddress of the loco we wish to monitor
- * @param p - PropertyChangeListener to attach to the throttle
+ * The PropertyChangeListener will be notified if it has been attached to a
+ * loco address or not, via a PropertyChange notification.
+ * <p>
+ * @param la LocoAddress of the loco we wish to monitor
+ * @param p  PropertyChangeListener to attach to the throttle
  */
-virtual void attachListener(LocoAddress* /*la*/, PropertyChangeListener* /*p*/) {}
+/*public*/ virtual void attachListener(LocoAddress* la, PropertyChangeListener* p) = 0;
 
 /**
  * Remove a PropertyChangeListener to a specific loco address, where the
@@ -428,8 +445,8 @@ virtual void attachListener(LocoAddress* /*la*/, PropertyChangeListener* /*p*/) 
  * @param la - DccLocoAddress of the loco we wish to monitor
  * @param p - PropertyChangeListener to attachremove from the throttle
 */
-virtual void removeListener(DccLocoAddress* /*la*/, PropertyChangeListener* /*p*/) {}
-//public void addressNoLongerRequired(DccLocoAddress la) const = 0;
+virtual void removeListener(LocoAddress* /*la*/, PropertyChangeListener* /*p*/) {}
+
 /**
  * A method to get the Name of the system that the programmer is associated with.
  */

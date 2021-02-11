@@ -5,6 +5,8 @@
 #include "changelistener.h"
 #include "focuslistener.h"
 #include "itemlistener.h"
+#include <QStringListModel>
+#include "comboboxmodel.h"
 
 class EventObject;
 class JComboBox : public QComboBox, public JComponent
@@ -14,6 +16,7 @@ class JComboBox : public QComboBox, public JComponent
 public:
  JComboBox(QWidget* parent = nullptr);
  JComboBox(QStringList list, QWidget* parent = nullptr);
+ JComboBox(ComboBoxModel* model, QWidget* parent = nullptr);
  ~JComboBox() {}
  JComboBox(const JComboBox&) : QComboBox() {}
 
@@ -32,21 +35,30 @@ public:
  /*public*/ void addFocusListener(FocusListener *l);
  /*public*/ void removeFocusListener(FocusListener* l);
  /*public*/ void addItemListener(ItemListener* listener);
-
+ /*public*/ void setEnabled(bool b) override {QComboBox::setEnabled(b);}
+ /*public*/ QString getSelectedItem() {return currentText();}
+ /*public*/ int getSelectedIndex() {return currentIndex();}
+ /*public*/ void setSelectedIndex(int i){setCurrentIndex(i);}
+ /*public*/ virtual void setSelectedItem(QString t) {setCurrentText(t);}
+ /*public*/ int getItemCount() {return count();}
+ /*public*/ QStringList itemList();
+ /*public*/ QVariant getItemAt(int i);
 
 signals:
  void itemStateChanged(ItemEvent* e);
  /*public*/ void focusGained(FocusEvent* fe);
  /*public*/ void focusLost(FocusEvent* fe);
 
-private:
-bool _opaque = false;
-Border* _border = nullptr;
-/*private*/ void focusInEvent(QFocusEvent* e);
-/*private*/ void focusOutEvent(QFocusEvent* e);
-
-private slots:
+ public slots:
  void currentIndexChanged(int);
+
+private:
+ bool _opaque = false;
+ Border* _border = nullptr;
+ /*private*/ void focusInEvent(QFocusEvent* e);
+ /*private*/ void focusOutEvent(QFocusEvent* e);
+ QStringListModel* cbModel;
+private slots:
  //void on_selected();
 };
 Q_DECLARE_METATYPE(JComboBox)

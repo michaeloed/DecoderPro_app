@@ -6,12 +6,21 @@
 JComboBox::JComboBox(QWidget* parent) : QComboBox(parent)
 {
  connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
+ cbModel = new QStringListModel();
+ setModel(cbModel);
 }
 
 JComboBox::JComboBox(QStringList list, QWidget* parent) : QComboBox(parent)
 {
  addItems(list);
  connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
+ cbModel = new QStringListModel();
+ setModel(cbModel);
+}
+
+JComboBox::JComboBox(ComboBoxModel* model, QWidget* parent)
+{
+
 }
 
 /*public*/ bool JComboBox::isOpaque()
@@ -89,4 +98,13 @@ void JComboBox::currentIndexChanged(int)
 /*public*/ void JComboBox::addItemListener(ItemListener* listener)
 {
  connect(this, SIGNAL(itemStateChanged(ItemEvent*)), listener, SLOT(itemStateChanged(ItemEvent*)));
+}
+
+/*public*/ QStringList JComboBox::itemList(){
+ return cbModel->stringList();
+}
+
+/*public*/ QVariant JComboBox::getItemAt(int i)
+{
+ return itemData(i);
 }

@@ -12,24 +12,26 @@
 #include "lnturnoutmanager.h"
 #include "loggerfactory.h"
 #include "namedbeancomparator.h"
+#include "defaultsystemconnectionmemo.h"
 
 // NOTE: This class is a repklacement for AbstractProxyManager that
 // implements TurnoutManager instead of AbstractManager
 
 AbstractProxyTurnoutManager::AbstractProxyTurnoutManager(QObject *parent)
-    : TurnoutManager(new SystemConnectionMemo(), parent)
+    : TurnoutManager(new DefaultSystemConnectionMemo(), parent)
 {
  mgrs = QList<Manager*>();
  internalManager = nullptr;
  defaultManager = nullptr;
  addedOrderList = QStringList();
- log->setDebugEnabled(true);
+ //log->setDebugEnabled(true);
  propertyListenerList = QVector<PropertyChangeListener*>();
  namedPropertyListenerMap = QMap<QString, QVector<PropertyChangeListener*>*>();
  propertyVetoListenerList = QVector<VetoableChangeListener*>();
  namedPropertyVetoListenerMap = QMap<QString, QVector<VetoableChangeListener*>*>();
 
-
+ if(log == nullptr)
+  log = LoggerFactory::getLogger("AbstractProxyManager");
  //registerSelf();
 }
 /**
@@ -80,7 +82,7 @@ AbstractProxyTurnoutManager::AbstractProxyTurnoutManager(QObject *parent)
  * Returns a list of all managers, including the
  * internal manager.  This is not a live list.
  */
-/*public*/ QList<Manager*> AbstractProxyTurnoutManager::getManagerList()
+/*public*/ QList<Manager*> AbstractProxyTurnoutManager::getManagerList() const
 {
  // make sure internal present
  initInternal();
@@ -94,7 +96,7 @@ AbstractProxyTurnoutManager::AbstractProxyTurnoutManager(QObject *parent)
  *
  * @return the list of managers
  */
-/*public*/ QList<Manager*> AbstractProxyTurnoutManager::getDisplayOrderManagerList() {
+/*public*/ QList<Manager*> AbstractProxyTurnoutManager::getDisplayOrderManagerList() const {
     // make sure internal present
     initInternal();
 
@@ -183,8 +185,9 @@ AbstractProxyTurnoutManager::AbstractProxyTurnoutManager(QObject *parent)
 /*private*/ Manager* AbstractProxyTurnoutManager::initInternal() const
 {
  if (internalManager == nullptr) {
+  if(log)
      log->debug("create internal manager when first requested");
-     internalManager = makeInternalManager();
+  internalManager = makeInternalManager();
  }
  return internalManager;
 }
@@ -304,24 +307,24 @@ AbstractProxyTurnoutManager::AbstractProxyTurnoutManager(QObject *parent)
 //@Override
 //@CheckReturnValue
 //@CheckForNull
-/*public*/ NamedBean* AbstractProxyTurnoutManager::getBySystemName(/*@Nonnull*/ QString systemName) const {
+/*public*/ Turnout* AbstractProxyTurnoutManager::getBySystemName(/*@Nonnull*/ QString systemName) const {
     // System names can be matched to managers by system and type at front of name
     int index = matchTentative(systemName);
     if (index >= 0) {
         Manager* m = getMgr(index);
-        return (NamedBean*)m->getBySystemName(systemName);
+        return (Turnout*)((AbstractTurnoutManager*)m)->getBySystemName(systemName);
     }
     log->debug(tr("getBySystemName did not find manager from name %1, defer to default manager").arg(systemName.isEmpty()?"(NULL)":systemName)); // NOI18N
-    return (NamedBean*)getDefaultManager()->getBySystemName(systemName);
+    return (Turnout*)((AbstractTurnoutManager*)getDefaultManager())->getBySystemName(systemName);
 }
 
 /** {@inheritDoc} */
 //@Override
 //@CheckReturnValue
 //@CheckForNull
-/*public*/ NamedBean *AbstractProxyTurnoutManager::getByUserName(/*@Nonnull*/ QString userName) const{
+/*public*/ Turnout *AbstractProxyTurnoutManager::getByUserName(/*@Nonnull*/ QString userName) const{
     for (Manager* m : this->mgrs) {
-        NamedBean* b = m->getByUserName(userName);
+        Turnout* b = ((AbstractTurnoutManager*)m)->getByUserName(userName);
         if (b != nullptr) {
             return b;
         }

@@ -55,7 +55,7 @@ TurnoutEditAction::TurnoutEditAction(QModelIndex index, QObject* parent) : BeanE
 } //IN18N
 
 //@Override
-/*public*/ void TurnoutEditAction::actionPerformed(ActionEvent*  e)
+/*public*/ void TurnoutEditAction::actionPerformed(JActionEvent *e)
 {
  oldAutomationSelection = ((Turnout*) bean)->getTurnoutOperation();
  oldModeSelection = ((Turnout*) bean)->getFeedbackModeName();
@@ -116,7 +116,7 @@ BeanItemPanel* TurnoutEditAction::feedback() {
     _feedback = new BeanItemPanel();
     _feedback->setName(tr("Feedback"));
 
-    modeBox = new QComboBox();
+    modeBox = new JComboBox();
     modeBox->addItems(((Turnout*) bean)->getValidFeedbackNames().toList());
     oldModeSelection = ((Turnout*) bean)->getFeedbackModeName();
     modeBox->setCurrentIndex(modeBox->findText(oldModeSelection));
@@ -140,7 +140,7 @@ BeanItemPanel* TurnoutEditAction::feedback() {
 
     QStringList str = QStringList();
     str << "empty";
-    automationBox = new QComboBox();
+    automationBox = new JComboBox();
     automationBox->addItems(str);
 
     _feedback->addItem(new BeanEditItem(automationBox, tr("Turnout Automation"), tr("Method used to retry the setting of the turnout")));
@@ -248,7 +248,7 @@ FeedbackSaveItemListener::FeedbackSaveItemListener(TurnoutEditAction *act)
  this->act = act;
 }
 
-/*public*/ void FeedbackSaveItemListener::actionPerformed(ActionEvent* /*e*/)
+/*public*/ void FeedbackSaveItemListener::actionPerformed(JActionEvent* /*e*/)
 {
  Turnout* t = (Turnout*) act->bean;
  QString modeName = act->modeBox->currentText();
@@ -316,7 +316,7 @@ FeedbackResetItemListener::FeedbackResetItemListener(TurnoutEditAction *act)
  this->act = act;
 }
 
-/*public*/ void FeedbackResetItemListener::actionPerformed(ActionEvent* /*e*/)
+/*public*/ void FeedbackResetItemListener::actionPerformed(JActionEvent* /*e*/)
 {
  Turnout* t = (Turnout*) act->bean;
 
@@ -327,7 +327,7 @@ FeedbackResetItemListener::FeedbackResetItemListener(TurnoutEditAction *act)
  QStringList* automationList = new QStringList;
  for(int i = 0; i < act->automationBox->count(); i++)
   automationList->append(act->automationBox->itemText(i));
- TurnoutTableAction::updateAutomationBox(t, automationList->toVector(), act->index);
+ TurnoutTableAction::updateAutomationBox(t, act->automationBox);
  //automationBox.addActionListener(automationSelectionListener);
  connect(act->automationBox, SIGNAL(currentIndexChanged(int)), this, SLOT(actionPerformed()));
 
@@ -345,7 +345,7 @@ AutomationSelectionListener::AutomationSelectionListener(TurnoutEditAction *act)
 {
  this->act = act;
 }
-void AutomationSelectionListener::actionPerformed(ActionEvent *)
+void AutomationSelectionListener::actionPerformed(JActionEvent *)
 {
  act->updateAutomationOptions();
 }
@@ -372,7 +372,7 @@ void TurnoutEditAction::updateFeedbackOptions()
  QStringList* automationList = new QStringList;
  for(int i = 0; i < automationBox->count(); i++)
   automationList->append(automationBox->itemText(i));
- TurnoutTableAction::updateAutomationBox(t, automationList->toVector(),index);
+ TurnoutTableAction::updateAutomationBox(t, automationBox);
 }
 
 void TurnoutEditAction::updateAutomationOptions() {
@@ -432,7 +432,7 @@ BeanItemPanel* TurnoutEditAction::lock() {
     QStringList lockOperations = QStringList()
      << bothText << cabOnlyText << pushbutText << noneText;
 
-    lockOperationBox = new QComboBox;
+    lockOperationBox = new JComboBox;
     lockOperationBox->addItems(lockOperations);
     lock->addItem(new BeanEditItem(lockOperationBox, tr("LockMode"), tr("LockModeToolTip")));
 //    lockOperationBox.addActionListener(new ActionListener() {
@@ -445,7 +445,7 @@ BeanItemPanel* TurnoutEditAction::lock() {
 //        }
 //    });
     connect(lockOperationBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(On_lockBox_currentIndex_changed(QString)));
-    lockBox = new QComboBox;
+    lockBox = new JComboBox;
     lockBox->addItems(((Turnout*) bean)->getValidDecoderNames());
     lock->addItem(new BeanEditItem(lockBox, tr("Accessory Decoder"), tr("JMRI needs to know what type of DCC decoder is in use so it can handle the lock properly.")));
 
@@ -520,7 +520,7 @@ LockSaveItemListener::LockSaveItemListener(TurnoutEditAction *act)
 {
  this->act = act;
 }
-/*public*/ void LockSaveItemListener::actionPerformed(ActionEvent* /*e*/) {
+/*public*/ void LockSaveItemListener::actionPerformed(JActionEvent* /*e*/) {
     Turnout* t = (Turnout*) act->bean;
     QString lockOpName =  act->lockOperationBox->currentText();
     if (lockOpName==(act->bothText)) {
@@ -544,7 +544,7 @@ LockResetItemListener::LockResetItemListener(TurnoutEditAction *act)
  this->act = act;
 }
 
-/*public*/ void LockResetItemListener::actionPerformed(ActionEvent* /*e*/)
+/*public*/ void LockResetItemListener::actionPerformed(JActionEvent* /*e*/)
 {
  Turnout* t = (Turnout*) act->bean;
  act->lockBox->setCurrentIndex(act->lockBox->findText(t->getDecoderName()));
@@ -599,13 +599,13 @@ BeanItemPanel* TurnoutEditAction::speed()
   }
  }
 
- closedSpeedBox = new QComboBox;
+ closedSpeedBox = new JComboBox;
  closedSpeedBox->addItems(speedListClosed.toList());
  closedSpeedBox->setEditable(true);
 
  speed->addItem(new BeanEditItem(closedSpeedBox, tr("Closed Speed"), tr("ClosedSpeedToolTip")));
 
- thrownSpeedBox = new QComboBox;
+ thrownSpeedBox = new JComboBox;
  thrownSpeedBox->addItems(speedListThrown.toList());
  thrownSpeedBox->setEditable(true);
  speed->addItem(new BeanEditItem(thrownSpeedBox, tr("Thrown Speed"), tr("The maximum Speed that a train is permited to run when the turnout is set thrown")));
@@ -681,7 +681,7 @@ SpeedSaveItemListener::SpeedSaveItemListener(TurnoutEditAction *act)
 {
  this->act = act;
 }
-/*public*/ void SpeedSaveItemListener::actionPerformed(ActionEvent* /*e*/)
+/*public*/ void SpeedSaveItemListener::actionPerformed(JActionEvent* /*e*/)
 {
  Turnout* t = (Turnout*) act->bean;
  QString speed =  act->closedSpeedBox->currentText();
@@ -709,7 +709,7 @@ SpeedResetItemListener::SpeedResetItemListener(TurnoutEditAction *act)
 {
  this->act = act;
 }
-/*public*/ void SpeedResetItemListener::actionPerformed(ActionEvent* /*e*/)
+/*public*/ void SpeedResetItemListener::actionPerformed(JActionEvent* /*e*/)
 {
  Turnout* t = (Turnout*) act->bean;
 

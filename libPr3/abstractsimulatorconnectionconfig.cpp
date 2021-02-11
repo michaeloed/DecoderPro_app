@@ -41,7 +41,8 @@
 
 }
 
-/*public*/ PortAdapter* AbstractSimulatorConnectionConfig::getAdapter() { return adapter; }
+//@Override
+/*public*/ PortAdapter* AbstractSimulatorConnectionConfig::getAdapter()  { return adapter; }
 
 /**
  * Ctor for a functional object with no prexisting adapter.
@@ -143,7 +144,7 @@ ASCCActionListener::ASCCActionListener(QString item, AbstractSimulatorConnection
     this->parent = parent;
 }
 
-void ASCCActionListener::actionPerformed(ActionEvent */*e*/)
+void ASCCActionListener::actionPerformed(JActionEvent */*e*/)
 {
     parent->adapter->setOptionState(item, parent->options.value(item)->getItem());
 }

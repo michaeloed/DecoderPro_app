@@ -21,6 +21,9 @@
 #include <QUrl>
 #include "class.h"
 #include "errorhandler.h"
+#include "ctc/ctcexception.h"
+#include "joptionpane.h"
+
 //#include "classmigrationmanager.h"
 
 /**
@@ -28,7 +31,7 @@
  * See the <A HREF="package-summary.html#schema">Schema versioning
  * discussion</a>. Also controls the stylesheet file version.
  */
-/*static*/ /*final*/const  /*public*/ QString ConfigXmlManager::schemaVersion = "-2-9-6";
+/*static*/ /*final*/const  /*public*/ QString ConfigXmlManager::schemaVersion = "-4-19-2";
 /*static*/ ErrorHandler* ConfigXmlManager::handler = new ErrorHandler();
 QString ConfigXmlManager::fileLocation = QString("layout")+QDir::separator();
 
@@ -351,7 +354,7 @@ void ConfigXmlManager::locateClassFailed(Throwable ex, QString adapterName, QObj
 
  QDomProcessingInstruction xmlProcessingInstruction = doc.createProcessingInstruction("xml", "version=\"1.0\"  encoding=\"UTF-8\"");
  doc.appendChild(xmlProcessingInstruction);
- xmlProcessingInstruction =  doc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\"/xml/XSLT/panelfile-" + schemaVersion + ".xsl\"");
+ xmlProcessingInstruction =  doc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\"/xml/XSLT/panelfile" + schemaVersion + ".xsl\"");
  doc.appendChild(xmlProcessingInstruction);
  QDomElement root = doc.createElement("layout-config");
  root.setAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
@@ -771,6 +774,13 @@ File userPrefsFile;*/
   //root = super.rootFromURL(url);
   XmlFile::setValidate(validate);
   root = doc.documentElement(); // get the root element of the document
+  if(root.tagName() != "layout-config")
+  {
+   int ret = JOptionPane::showOptionDialog(nullptr, "This may not be a valid panel xml file.\nDo you want to continue>", "Warning",
+                                           JOptionPane::OK_CANCEL_OPTION, JOptionPane::WARNING_MESSAGE);
+   if(ret > 0)
+    return false;
+  }
   // get the objects to load
   QDomNodeList items = root.childNodes();
   for (int i = 0; i<items.size(); i++)
@@ -1012,6 +1022,12 @@ File userPrefsFile;*/
 
    result = false;  // keep going, but return false to signal problem
   }
+  catch (CTCException e)
+  {
+        creationErrorEncountered(nullptr, "loading from file " + url.path(),
+                "Unknown error (Exception)", nullptr, nullptr, &e);
+        result = false;
+  }
   /*finally */
 
   {
@@ -1074,7 +1090,7 @@ File userPrefsFile;*/
     bool loadStatus;
     if(adapter != nullptr)
     {
-     loadStatus = adapter->load(item);
+     loadStatus = adapter->load(item, item);
      log->debug("deferred load status for "+adapterName+" is "+(loadStatus?"true":"false"));
     }
     else

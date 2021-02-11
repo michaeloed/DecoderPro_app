@@ -46,7 +46,7 @@ public:
     static /*final*/ QString resume;// = tr("Resume");
     static /*final*/ QString abort;// = tr("Abort");
     static /*final*/ QStringList controls;// = {halt, resume, abort};
-    /*public*/ void actionPerformed(ActionEvent* e = 0);
+    /*public*/ void actionPerformed(JActionEvent* e = 0) override;
 //    /*synchronized*/ /*public*/ static void closeWarrantFrame(QString key);
     /*synchronized*/ static /*public*/ void mouseClickedOnBlock(OBlock* block);
     /*public*/ static bool checkSharedTurnouts(OBlock* block);
@@ -64,7 +64,7 @@ private:
     /*private*/ static QHash <QString, WarrantFrame*>* _frameMap;// = new HashMap <String, WarrantFrame> ();
     /*private*/ static WarrantTableAction* _instance;
     /*private*/ static QMap <QString, Warrant*> _warrantMap;// = new HashMap <String, Warrant> ();
-    /*private*/ static JTextArea* _textArea;
+    ///*private*/ static JTextArea* _textArea;
     /*private*/ static bool _hasErrors;// = false;
     /*private*/ static JDialog* _errorDialog;
     static JTextField*  _startWarrant;// = new JTextField(30);
@@ -130,9 +130,9 @@ public:
 //         myListener(java.awt.Window w) {
 //             _w = w;
 //         }  */
- /*public*/ void actionPerformed(ActionEvent* /*e*/)
+ /*public*/ void actionPerformed(JActionEvent* /*e*/)
  {
-     WarrantTableFrame::getDefault();
+     _errorDialog->dispose();
  }
 };
 /*static*/ class CreateWarrantFrame : public JFrame
@@ -198,7 +198,7 @@ class CreateNXWarrantActionListener : public ActionListener
 public:
 
 public slots:
- void actionPerformed(ActionEvent */*e */= 0)
+ void actionPerformed(JActionEvent */*e */= 0)
  {
   WarrantTableFrame::nxAction();
  }

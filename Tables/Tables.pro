@@ -89,7 +89,25 @@ SOURCES +=  slotmonitor.cpp \
     conditionaleditbase.cpp \
     conditionallistedit.cpp \
     picksinglepanel.cpp \
-    addnewdevicepanel.cpp
+    addnewdevicepanel.cpp \
+    oblocktableframe.cpp \
+    oblocktablepanel.cpp \
+    portaleditframe.cpp \
+    signaleditframe.cpp \
+    oblockeditaction.cpp \
+    blockpatheditframe.cpp \
+    sensoreditaction.cpp \
+    routetabledatamodel.cpp \
+    routeeditframe.cpp \
+    abstractrouteaddeditframe.cpp \
+    routeturnout.cpp \
+    routesensor.cpp \
+    routeelement.cpp \
+    routesensormodel.cpp \
+    routeturnoutmodel.cpp \
+    routeaddframe.cpp \
+    routeoutputmodel.cpp \
+    routeexporttologix.cpp
 
 HEADERS += libtables_global.h \
     slotmonitor.h \
@@ -167,7 +185,25 @@ HEADERS += libtables_global.h \
     conditionallistedit.h \
     signallingpanel.h \
     picksinglepanel.h \
-    addnewdevicepanel.h
+    addnewdevicepanel.h \
+    oblocktableframe.h \
+    oblocktablepanel.h \
+    portaleditframe.h \
+    signaleditframe.h \
+    oblockeditaction.h \
+    blockpatheditframe.h \
+    sensoreditaction.h \
+    routetabledatamodel.h \
+    routeeditframe.h \
+    abstractrouteaddeditframe.h \
+    routeturnout.h \
+    routesensor.h \
+    routeelement.h \
+    routesensormodel.h \
+    routeturnoutmodel.h \
+    routeaddframe.h \
+    routeoutputmodel.h \
+    routeexporttologix.h
 
 unix:!symbian {
     maemo5 {
@@ -204,7 +240,7 @@ FORMS += \
 #    logixwidget.ui \
 #    sectionwidget.ui \
 #    transitwidget.ui \
-    editconditionalframe.ui \
+    editconditionalframe.ui
 #    addeditlightdialog1.ui \
 #    audiowidget.ui \
 #    tablesframe.ui

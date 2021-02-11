@@ -119,7 +119,6 @@ SOURCES += \
     abstractprogrammer.cpp \
     loconetslot.cpp \
     systemconnectionmemomanager.cpp \
-    systemconnectionmemo.cpp \
     loconetsystemconnectionmemo.cpp \
     abstractpowermanager.cpp \
     lnpowermanager.cpp \
@@ -210,7 +209,6 @@ SOURCES += \
     Throttle/throttlewindow.cpp \
     Roster/locofile.cpp \
     Roster/cvtablemodel.cpp \
-    Roster/indexedcvtablemodel.cpp \
     Roster/abstractvalue.cpp \
     Roster/cvvalue.cpp \
     Roster/variabletablemodel.cpp \
@@ -221,8 +219,6 @@ SOURCES += \
     Roster/compositevariablevalue.cpp \
     Roster/decvariablevalue.cpp \
     Roster/hexvariablevalue.cpp \
-    Roster/indexedenumvariablevalue.cpp \
-    Roster/indexedvariablevalue.cpp \
     Roster/longaddrvariablevalue.cpp \
     Roster/shortaddrvariablevalue.cpp \
     Roster/speedtablevarvalue.cpp \
@@ -233,20 +229,15 @@ SOURCES += \
     Roster/resettablemodel.cpp \
     Roster/combocheckbox.cpp \
     Roster/comboradiobuttons.cpp \
-    Roster/indexedcombocheckbox.cpp \
-    Roster/indexedpairvariablevalue.cpp \
     Roster/decvarslider.cpp \
     Roster/comboonradiobutton.cpp \
     Roster/combooffradiobutton.cpp \
-    Roster/indexedvarslider.cpp \
     Roster/rosterentrypane.cpp \
     Roster/decoderindexfile.cpp \
-    Roster/defaultcomboboxmodel.cpp \
     Roster/busyglasspane.cpp \
     Roster/dccaddresspanel.cpp \
     Roster/paneprogpane.cpp \
     Roster/watchinglabel.cpp \
-    Roster/vartextfield.cpp \
     Roster/fnmappanel.cpp \
     Roster/paneprogframe.cpp \
     Roster/paneopsprogframe.cpp \
@@ -302,7 +293,6 @@ SOURCES += \
     throttlesetting.cpp \
     oblockmanager.cpp \
     engineer.cpp \
-    Throttle/learnthrottleframe.cpp \
     warrantmanager.cpp \
     entryexitpairs.cpp \
     source.cpp \
@@ -544,7 +534,6 @@ SOURCES += \
     zipfile.cpp \
     vsdsound.cpp \
     vsdecoderevent.cpp \
-    storexmlvsdecoderaction.cpp \
     trigger.cpp \
     soundevent.cpp \
     momentarysoundevent.cpp \
@@ -979,7 +968,113 @@ SOURCES += \
     cabsignalpane.cpp \
     cabsignalaction.cpp \
     zeroconfservicemanager.cpp \
-    zeroconfpreferences.cpp
+    zeroconfpreferences.cpp \
+    logix/learnthrottleframe.cpp \
+    defaultsystemconnectionmemo.cpp \
+    lnpredefinedmeters.cpp \
+    meterupdatetask.cpp \
+    loconet/lnmeterinittask.cpp \
+    abstractanalogio.cpp \
+    defaultmeter.cpp \
+    loconet/lniplimplementation.cpp \
+    loconet/lndplxgrpinfoimpl.cpp \
+    meterframe.cpp \
+    meterframemanager.cpp \
+    meterframemanagerxml.cpp \
+    meteraction.cpp \
+    proxymetermanager.cpp \
+    abstractproxymetermanager.cpp \
+    internalmetermanager.cpp \
+    abstractmetermanager.cpp \
+    internalmetermanagerxml.cpp \
+    abstractmetermanagerxml.cpp \
+    ctc/nbhsensor.cpp \
+    ctc/ctcexception.cpp \
+    ctc/ctcexceptionbuffer.cpp \
+    ctc/ctcmanager.cpp \
+    ctc/projectscommonsubs.cpp \
+    ctc/programproperties.cpp \
+    ctc/ctcserialdata.cpp \
+    ctc/nbhsignal.cpp \
+    ctc/nbhturnout.cpp \
+    ctc/otherdata.cpp \
+    ctc/codebuttonhandlerdata.cpp \
+    ctc/trafficlockingdata.cpp \
+    ctc/frmtrl_rules.cpp \
+    ctc/ctcfiles.cpp \
+    ctc/callondata.cpp \
+    ctc/topologyinfo.cpp \
+    ctc/commonsubs.cpp \
+    ctc/awtwindowproperties.cpp \
+    ctc/checkjmriobject.cpp \
+    ctc/ctcmain.cpp \
+    ctc/codebuttonhandler.cpp \
+    ctc/lockedroutesmanager.cpp \
+    ctc/turnoutlock.cpp \
+    ctc/ctceditoraction.cpp \
+    ctc/frmmainform.cpp \
+    ctc/columns.cpp \
+    ctc/frmswdi.cpp \
+    ctc/codebuttonhandlerdataroutines.cpp \
+    ctc/ctcrunaction.cpp \
+    ctc/ctcmanagerxml.cpp \
+    ctc/frmaddmodifyctccolumn.cpp \
+    ctc/frmcb.cpp \
+    ctc/frmabout.cpp \
+    ctc/frmguidesign.cpp \
+    ctc/frmco.cpp \
+    ctc/importexternaldata.cpp \
+    ctc/importotherdata.cpp \
+    ctc/importcodebuttonhandlerdata.cpp \
+    ctc/callonentry.cpp \
+    ctc/trafficlockingentry.cpp \
+    ctc/createguiobjectsxmlfile.cpp \
+    ctc/frmdefaults.cpp \
+    ctc/frmdebugging.cpp \
+    ctc/frmsidi.cpp \
+    ctc/frmswdl.cpp \
+    ctc/frmtrl.cpp \
+    ctc/topology.cpp \
+    ctc/frmsidl.cpp \
+    ctc/frmtul.cpp \
+    ctc/frmil.cpp \
+    ctc/frmfleeting.cpp \
+    ctc/frmpatterns.cpp \
+    ctc/frmfixerrors.cpp \
+    ctc/lockedroute.cpp \
+    ctc/reentrantlock.cpp \
+    ctc/signaldirectionindicators.cpp \
+    ctc/requesteddirectionobserved.cpp \
+    ctc/codebuttonsimulator.cpp \
+    ctc/switchdirectionlever.cpp \
+    ctc/signaldirectionlever.cpp \
+    ctc/switchdirectionindicators.cpp \
+    ctc/trafficlockinginfo.cpp \
+    ctc/fleeting.cpp \
+    ctc/callon.cpp \
+    ctc/switchindicatorsroute.cpp \
+    ctc/indicationlockingsignals.cpp \
+    ctc/trafficlocking.cpp \
+    storemenu.cpp \
+    systemconnectionmemo.cpp \
+    managercombobox.cpp \
+    abstractblockmanager.cpp \
+    abstractsectionmanager.cpp \
+    abstractnamedbeanhandlemanager.cpp \
+    abstractroutemanager.cpp \
+    loconet/lncvdevicesmanager.cpp \
+    loconet/lncvdevices.cpp \
+    loconet/lncvdevice.cpp \
+    loconet/lncvmessagecontents.cpp \
+    loconet/lncvprogtablemodel.cpp \
+    loconet/lncvprogpane.cpp \
+    loconet/lncvprogaction.cpp \
+    logix/learnfunctionpanel.cpp \
+    logix/learncontrolpanel.cpp \
+    logix/learnspeedpanel.cpp \
+    abstractprogrammerserver.cpp \
+    searchbar.cpp \
+    cvutil.cpp
 
 
  !contains(FTDI, 1) {
@@ -1053,7 +1148,6 @@ HEADERS += \
     proxyturnoutmanager.h \
     internalsensormanager.h \
     internalturnoutmanager.h \
-    runnable.h \
     sensor.h \
     abstractmemory.h \
     physicallocationreporter.h \
@@ -1131,7 +1225,6 @@ HEADERS += \
     Throttle/throttlewindow.h \
     Roster/locofile.h \
     Roster/cvtablemodel.h \
-    Roster/indexedcvtablemodel.h \
     Roster/abstractvalue.h \
     Roster/cvvalue.h \
     Roster/variabletablemodel.h \
@@ -1143,8 +1236,6 @@ HEADERS += \
     Roster/compositevariablevalue.h \
     Roster/decvariablevalue.h \
     Roster/hexvariablevalue.h \
-    Roster/indexedenumvariablevalue.h \
-    Roster/indexedvariablevalue.h \
     Roster/longaddrvariablevalue.h \
     Roster/shortaddrvariablevalue.h \
     Roster/speedtablevarvalue.h \
@@ -1156,21 +1247,16 @@ HEADERS += \
     Roster/combocheckbox.h \
     Roster/comboradiobuttons.h \
     Roster/listdatalistener.h \
-    Roster/indexedcombocheckbox.h \
-    Roster/indexedpairvariablevalue.h \
     Roster/decvarslider.h \
     Roster/comboonradiobutton.h \
     Roster/combooffradiobutton.h \
-    Roster/indexedvarslider.h \
     Roster/rosterentrypane.h \
     Roster/decoderindexfile.h \
-    Roster/defaultcomboboxmodel.h \
     Roster/paneprogpane.h \
     Roster/panecontainer.h \
     Roster/busyglasspane.h \
     Roster/dccaddresspanel.h \
     Roster/watchinglabel.h \
-    Roster/vartextfield.h \
     Roster/fnmappanel.h \
     #Roster/functionlabelspane.h \
     Roster/paneprogframe.h \
@@ -1246,7 +1332,6 @@ HEADERS += \
     throttlesetting.h \
     oblockmanager.h \
     engineer.h \
-    Throttle/learnthrottleframe.h \
     warrantmanager.h \
     entryexitpairs.h \
     source.h \
@@ -1493,7 +1578,6 @@ HEADERS += \
     zipfile.h \
     vsdsound.h \
     vsdecoderevent.h \
-    storexmlvsdecoderaction.h \
     trigger.h \
     soundevent.h \
     momentarysoundevent.h \
@@ -1964,7 +2048,124 @@ HEADERS += \
     zeroconfservicemanager.h \
     networktopologylistener.h \
     networktopologyevent.h \
-    zeroconfpreferences.h
+    zeroconfpreferences.h \
+    logix/learnthrottleframe.h \
+    defaultsystemconnectionmemo.h \
+    lnpredefinedmeters.h \
+    meterupdatetask.h \
+    meter.h \
+    loconet/lnmeterinittask.h \
+    metermanager.h \
+    currentmeter.h \
+    voltagemeter.h \
+    abstractanalogio.h \
+    defaultmeter.h \
+    analogio.h \
+    loconet/lniplimplementation.h \
+    loconet/lndplxgrpinfoimpl.h \
+    loconet/lndplxgrpinfoimplconstants.h \
+    loconet/duplexgroupmessagetype.h \
+    meterframe.h \
+    meterframemanager.h \
+    meterframemanagerxml.h \
+    meteraction.h \
+    proxymetermanager.h \
+    abstractproxymetermanager.h \
+    internalmetermanager.h \
+    abstractmetermanager.h \
+    internalmetermanagerxml.h \
+    abstractmetermanagerxml.h \
+    ctc/nbhsensor.h \
+    ctc/ctcexception.h \
+    ctc/ctcexceptionbuffer.h \
+    ctc/ctcmanager.h \
+    ctc/projectscommonsubs.h \
+    ../LayoutEditor/disposable.h \
+    ctc/programproperties.h \
+    ctc/ctcserialdata.h \
+    ctc/nbhsignal.h \
+    ctc/nbhturnout.h \
+    ctc/otherdata.h \
+    ctc/codebuttonhandlerdata.h \
+    ctc/trafficlockingdata.h \
+    ctc/frmtrl_rules.h \
+    ctc/ctcfiles.h \
+    ctc/callondata.h \
+    ctc/topologyinfo.h \
+    ctc/commonsubs.h \
+    ctc/awtwindowproperties.h \
+    ctc/checkjmriobject.h \
+    ctc/ctcmain.h \
+    ctc/codebuttonhandler.h \
+    ctc/ctcconstants.h \
+    ctc/lockedroutesmanager.h \
+    ctc/turnoutlock.h \
+    ctc/ctceditoraction.h \
+    ctc/frmmainform.h \
+    ctc/columns.h \
+    ctc/frmswdi.h \
+    ctc/codebuttonhandlerdataroutines.h \
+    ctc/ctcrunaction.h \
+    ctc/ctcmanagerxml.h \
+    ctc/frmaddmodifyctccolumn.h \
+    ctc/frmcb.h \
+    ctc/frmabout.h \
+    ctc/frmguidesign.h \
+    ctc/frmco.h \
+    ctc/importexternaldata.h \
+    ctc/importotherdata.h \
+    ctc/importcodebuttonhandlerdata.h \
+    ctc/callonentry.h \
+    ctc/trafficlockingentry.h \
+    ctc/createguiobjectsxmlfile.h \
+    ctc/frmdefaults.h \
+    ctc/frmdebugging.h \
+    ctc/frmsidi.h \
+    ctc/frmswdl.h \
+    ctc/frmtrl.h \
+    ctc/topology.h \
+    ctc/frmsidl.h \
+    ctc/frmtul.h \
+    ctc/frmil.h \
+    ctc/frmfleeting.h \
+    ctc/frmpatterns.h \
+    ctc/frmfixerrors.h \
+    ctc/lockedroute.h \
+    ctc/reentrantlock.h \
+    ctc/lock.h \
+    ctc/signaldirectionindicators.h \
+    ctc/signaldirectionindicatorsinterface.h \
+    ctc/requesteddirectionobserved.h \
+    ctc/codebuttonsimulator.h \
+    ctc/switchdirectionlever.h \
+    ctc/signaldirectionlever.h \
+    ctc/switchdirectionindicators.h \
+    ctc/trafficlockinginfo.h \
+    ctc/fleeting.h \
+    ctc/callon.h \
+    ctc/switchindicatorsroute.h \
+    ctc/indicationlockingsignals.h \
+    ctc/trafficlocking.h \
+    storemenu.h \
+    managercombobox.h \
+    abstractblockmanager.h \
+    abstractsectionmanager.h \
+    abstractnamedbeanhandlemanager.h \
+    abstractroutemanager.h \
+    loconet/lncvdevicesmanager.h \
+    loconet/lncvdevices.h \
+    loconet/lncvdevice.h \
+    loconet/lncvmessagecontents.h \
+    loconet/programmingtool.h \
+    loconet/lncvprogtablemodel.h \
+    loconet/lncvprogpane.h \
+    loconet/lncvprogaction.h \
+    logix/learncontrolpanel.h \
+    logix/learnfunctionpanel.h \
+    logix/learnspeedpanel.h \
+    abstractprogrammerserver.h \
+    searchbar.h \
+    cvutil.h
 
 
  !contains(FTDI, 1) {

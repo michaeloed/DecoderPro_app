@@ -237,7 +237,29 @@ SOURCES += \
     layouteditor/layoutshapetest.cpp \
     layouteditor/layoutshapetestaction.cpp \
     entryexit/circuitbuildertest.cpp \
-    entryexit/circuitbuildertestaction.cpp
+    entryexit/circuitbuildertestaction.cpp \
+    loconet/controlpaneltest.cpp \
+    loconet/controlpaneltestaction.cpp \
+    misc/meterframetest.cpp \
+    loconet/lnpredefinedmeterstest.cpp \
+    loconet/lnpredefinedmeterstestaction.cpp \
+    loconet/lniplimplementationtest.cpp \
+    loconet/lniplimplementationtestaction.cpp \
+    tables/oblocktableactiontest.cpp \
+    tables/oblocktableactiontestaction.cpp \
+    loconet/lncvdevicetest.cpp \
+    loconet/lncvdevicetestaction.cpp \
+    loconet/lncvmessagecontentsclasstest.cpp \
+    loconet/lncvmessagecontentsclasstestaction.cpp \
+    jmripaneltest.cpp \
+    loconet/lncvprogpanetestaction.cpp \
+    loconet/lncvprogtablemodeltest.cpp \
+    loconet/lncvprogtablemodeltestaction.cpp \
+    loconet/lncvprogpanetest.cpp \
+    misc/identifydecodertest.cpp \
+    misc/identifydecodertestaction.cpp \
+    misc/cvutiltest.cpp \
+    misc/cvutiltestaction.cpp
 
 HEADERS += \
         tests.h \
@@ -452,7 +474,30 @@ HEADERS += \
     layouteditor/layoutshapetest.h \
     layouteditor/layoutshapetestaction.h \
     entryexit/circuitbuildertest.h \
-    entryexit/circuitbuildertestaction.h
+    entryexit/circuitbuildertestaction.h \
+    loconet/controlpaneltest.h \
+    loconet/controlpaneltestaction.h \
+    misc/meterframetest.h \
+    loconet/lnpredefinedmeterstest.h \
+    loconet/lnpredefinedmeterstestaction.h \
+    loconet/lniplimplementationtest.h \
+    loconet/lniplimplementationtestaction.h \
+    tables/oblocktableactiontest.h \
+    tables/oblocktableactiontestaction.h \
+    loconet/lncvdevicetest.h \
+    loconet/lncvdevicetestaction.h \
+    loconet/lncvmessagecontentsclasstest.h \
+    loconet/lncvmessagecontentsclasstestaction.h \
+    lncvprogpanetest.h \
+    jmripaneltest.h \
+    loconet/lncvprogpanetestaction.h \
+    loconet/lncvprogtablemodeltest.h \
+    loconet/lncvprogtablemodeltestaction.h \
+    loconet/lncvprogpanetest.h \
+    misc/identifydecodertest.h \
+    misc/identifydecodertestaction.h \
+    misc/cvutiltest.h \
+    misc/cvutiltestaction.h
 
 unix {
     target.path = /usr/lib

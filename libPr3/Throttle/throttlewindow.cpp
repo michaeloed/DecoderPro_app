@@ -22,7 +22,6 @@
 #include "throttlecreationaction.h"
 #include "smallpowermanagerbutton.h"
 #include "controlpanel.h"
-#include "learnthrottleframe.h"
 #include "warrantframe.h"
 #include "functionpanel.h"
 #include "loconetsystemconnectionmemo.h"
@@ -44,6 +43,7 @@
 #ifdef SCRIPTING_ENABLED
 #include "jynstrument.h"
 #endif
+#include "joptionpane.h"
 
 ThrottleWindow::ThrottleWindow(/*LocoNetSystemConnectionMemo* memo,*/ QWidget *parent) :
     JmriJFrame(parent),
@@ -57,8 +57,7 @@ ThrottleWindow::ThrottleWindow(/*LocoNetSystemConnectionMemo* memo,*/ QWidget *p
  this->addDockWidget(static_cast<Qt::DockWidgetArea>(Qt::RightDockWidgetArea ), addressPanel,Qt::Horizontal);
  connect(this, SIGNAL(throttleWindowupdate(PropertyChangeEvent*)), addressPanel, SLOT(propertyChange(PropertyChangeEvent*)));
 
- LearnThrottleFrame* lf = NULL; //new LearnThrottleFrame(new WarrantFrame("xxx",this));
- controlPanel = new ControlPanel(lf, this);
+ controlPanel = new ControlPanel(this);
  controlPanel->setObjectName(QString::fromUtf8("controlPanel"));
  controlPanel->setWindowTitle(tr("Control Panel"));
  controlPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
@@ -133,6 +132,7 @@ ThrottleWindow::ThrottleWindow(/*LocoNetSystemConnectionMemo* memo,*/ QWidget *p
  addressPanel->addAddressListener((AddressListener*)this);
  //addressPanel->addAddressListener((AddressListener*)((ThrottleFrameManager*)InstanceManager::getDefault("ThrottleFrameManager"))->getThrottlesListPanel()->getTableModel());
  functionPanel->setAddressPanel(addressPanel);
+ functionPanel->setEnabled(false);
  controlPanel->setAddressPanel(addressPanel);
  speedPanel->setAddressPanel(addressPanel);
 
@@ -327,10 +327,10 @@ ThrottleWindow::~ThrottleWindow()
 //    editMenuExportRoster.addActionListener(new ActionListener() {
 
 //        public void actionPerformed(ActionEvent e) {
-//            getCurrentThrottleFrame().saveRosterChanges();
+ connect(editMenuExportRoster, &QAction::triggered, [=]{
+   getCurrentThrottleFrame()->saveRosterChanges();
 //        }
-//    });
- connect(editMenuExportRoster, SIGNAL(triggered()), this, SLOT(OnEditMenuExportRoster()));
+ });
  editMenu->addSeparator();
  editMenu->addAction(new ThrottlesPreferencesAction(tr("Throttles Preferences"),this)); // now in tabbed preferences
 
@@ -385,12 +385,6 @@ ThrottleWindow::~ThrottleWindow()
  // add help selection
  addHelpMenu("package.jmri.jmrit.throttle.ThrottleFrame", true);
 }
-void ThrottleWindow::OnEditMenuExportRoster()
-{
- // TODO: getCurrentThrottleFrame()->saveRosterChanges();
-}
-
-
 
 //void ThrottleWindow::on_newThrottle_clicked() // not used?
 //{
@@ -853,23 +847,27 @@ void ThrottleWindow::OnFileMenuLoad()
 /*public*/ void ThrottleWindow::previousThrottleFrame() {
 //		throttlesLayout.previous(throttlesPanel);
 //		updateGUI();
+}
+
+/*public*/ void ThrottleWindow::setEditMode(bool mode) {
+    if (mode == isEditMode)
+        return;
+    isEditMode = mode;
+    if (!throttleFrames->isEmpty()) {
+        for (QListIterator<ThrottleWindow*> tfi(throttleFrames->values()); tfi.hasNext();) {
+            tfi.next()->setEditMode(isEditMode);
+        }
     }
+    updateGUI();
+}
+
+/*public*/ bool ThrottleWindow::getEditMode() {
+    return isEditMode;
+}
+
 /*private*/ void ThrottleWindow::switchMode()
 {
- if (isVisible()) {
-#if 0
-     if (isEditMode) {
-         playRendering();
-     } else {
-         editRendering();
-     }
-#endif
-     isEditMode = !isEditMode;
-     willSwitch = false;
- } else {
-     willSwitch = !willSwitch;
- }
- updateGUI();
+ setEditMode(!isEditMode);
 }
 
 
@@ -888,24 +886,31 @@ void ThrottleWindow::windowClosing(QCloseEvent *)
  */
 /*public*/ void ThrottleWindow::dispose()
 {
-#if 0 // why is this here?
- if ((throttleFrames!= NULL) && (! throttleFrames->isEmpty() ))
- {
-  //for (Iterator<ThrottleFrame> tfi = throttleFrames.values().iterator(); tfi.hasNext(); )
-     QListIterator<ThrottleWindow*> tfi(throttleFrames->values());
-  {
-   tfi.next()->dispose();
-  }
- }
- throttleFrames = NULL;
-#endif
- //throttlesPanel.removeAll();
-//    removeAll();
-//    super.dispose();
+ log->debug(tr("Disposing %1").arg(getTitle()));
+ addressPanel->removeAddressListener(this);
  ThrottleFrameManager::instance()->getThrottlesListPanel()->getTableModel()->removeThrottleFrame(this, addressPanel->getCurrentAddress());
+ // check for any special disposing in InternalFrames
+ controlPanel->destroy();
+ functionPanel->destroy();
+ speedPanel->destroy();
+ // dispose of this last because it will release and destroy throttle.
  addressPanel->destroy();
 
 }
+
+/*public*/ void ThrottleWindow::saveRosterChanges() {
+    RosterEntry* rosterEntry = addressPanel->getRosterEntry();
+    if (rosterEntry == nullptr) {
+        JOptionPane::showMessageDialog(this, tr("Select loco using roster menu in Address Panel"), tr("No roster entry selected"), JOptionPane::ERROR_MESSAGE);
+        return;
+    }
+    if (JOptionPane::showConfirmDialog(this, tr("Update roster entry with function buttons changes?"), tr("Update roster entry"), JOptionPane::YES_NO_OPTION) != JOptionPane::YES_OPTION) {
+        return;
+    }
+    functionPanel->saveFunctionButtonsToRoster(rosterEntry);
+    controlPanel->saveToRoster(rosterEntry);
+}
+
 /*public*/ void ThrottleWindow::removeThrottleFrame(ThrottleWindow* tf)
 {
  if ( cardCounterNB > 1 ) // we don't like empty ThrottleWindow

@@ -400,7 +400,7 @@ protected:
  /**
   * Display popup menu for information and editing
   */
- /*protected*/ QMenu* showPopup(QGraphicsSceneMouseEvent* e) override;
+ // /*protected*/ QMenu* showPopup(QGraphicsSceneMouseEvent* e) override;
 
  friend class LayoutEditor;
  //friend class EditTrackSegmentDlg;
@@ -418,7 +418,7 @@ class TSAbstractAction : public AbstractAction
 public:
  TSAbstractAction(QString name, QObject* parent);
  public slots:
-   /*public*/ void actionPerformed(ActionEvent* e = 0) override;
+   /*public*/ void actionPerformed(JActionEvent* e = 0) override;
 };
 
 #endif // TRACKSEGMENT_H

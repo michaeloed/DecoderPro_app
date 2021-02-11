@@ -215,8 +215,9 @@ void JFrame::setLocation(int x, int y)
 
 void JFrame::dispose()
 {
-// close();
+  close();
  //deleteLater();
+  _closed = true;
  if(!_windowClosing)
   log->error(tr("dispose() called but window isn't closing!"));
 }
@@ -403,6 +404,8 @@ void JFrame::closeEvent(QCloseEvent* e)
 //      ((Apps*)l)->windowClosing(e);
 //  else
   l->windowClosing(e);
+  if(e->isAccepted())
+   l->windowClosed(e);
  }
  switch (defaultCloseOperation) {
   case HIDE_ON_CLOSE:
@@ -411,6 +414,10 @@ void JFrame::closeEvent(QCloseEvent* e)
   case DISPOSE_ON_CLOSE:
       dispose();
       deleteLater();
+      foreach(WindowListener* l, *listeners)
+      {
+       l->windowClosed(e);
+      }
       break;
   case EXIT_ON_CLOSE:
       // This needs to match the checkExit call in
@@ -579,4 +586,10 @@ void JFrame::setVisible(bool visible)
   delete _layout;
   _layout = nullptr;
  }
+}
+
+/*public*/ void JFrame::setBounds(QRect r)
+{
+ resize(r.width(), r.height());
+ setLocation(r.left(), r.top());
 }

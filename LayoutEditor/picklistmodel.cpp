@@ -1013,7 +1013,7 @@ void MemoryPickModel::newMemoryCreated(Memory*t)
 //class ReporterPickModel extends PickListModel {
 ReporterPickModel::ReporterPickModel (QObject *parent) : PickListModel(parent)
 {
- manager = InstanceManager::reporterManagerInstance();
+ manager = (ReporterManager*)InstanceManager::getDefault("ReporterManager");
  _name = tr("Reporter Table");
  ProxyReporterManager* mgr = (ProxyReporterManager*)manager;
  QList<Manager*> mgrList = mgr->getManagerList();
@@ -1243,7 +1243,7 @@ EntryExitPickModel::EntryExitPickModel (QObject* parent): PickListModel(parent) 
     return manager;
 }
 /*public*/ NamedBean* EntryExitPickModel::getBySystemName(QString name) {
-    return manager->getBySystemName(name);
+    return (NamedBean*)manager->getBySystemName(name);
 }
 
 /*public*/ NamedBean* EntryExitPickModel::addBean(QString /*name*/) {
